@@ -30,17 +30,17 @@ Highlights:
 * **SOTA**: FasterSeg achieves extremely fast speed (over 30\% faster than the closest competitor on CityScapes) and maintains competitive accuracy.
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/chenwydj/FasterSeg/master/images/table4.png" alt="Cityscapes" width="900"/></br>
+<img src="images/table4.png" alt="Cityscapes" width="550"/></br>
 </p>
 
 ## Methods
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/chenwydj/FasterSeg/master/images/figure1.png" alt="supernet" width="600"/></br>
+<img src="images/figure1.png" alt="supernet" width="800"/></br>
 </p>
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/chenwydj/FasterSeg/master/images/figure6.png" alt="fasterseg" width="600"/></br>
+<img src="images/figure6.png" alt="fasterseg" width="500"/></br>
 </p>
 
 ## Prerequisites
