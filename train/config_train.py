@@ -84,12 +84,12 @@ C.eval_width = 2048
 C.layers = 16
 """ Search/Train Config """
 ##### train teacher model only #######################################
-C.arch_idx = [0]
+C.arch_idx = [0] # 0 for teacher
 C.branch = [2]
 C.width_mult_list = [4./12, 6./12, 8./12, 10./12, 1.,]
 C.stem_head_width = [(1, 1)]
-C.load_path = "search-224x448_F12.L16_batch2-20200102-123456"
-C.load_epoch = "20" # "last" or "int()"
+C.load_path = "search-224x448_F12.L16_batch2-20200102-123456" # path to the searched directory
+C.load_epoch = "last" # "last" or "int" (e.g. "30"): which epoch to load from the searched architecture
 C.batch_size = 12
 C.Fch = 12
 C.image_height = 512
@@ -97,19 +97,19 @@ C.image_width = 1024
 C.save = "%dx%d_teacher_batch%d"%(C.image_height, C.image_width, C.batch_size)
 ########################################
 ##### train student with KL distillation from teacher ##############
-# C.distill_start_epoch = 0 # 55
-# C.arch_idx = [0, 1]
+# C.arch_idx = [0, 1] # 0 for teacher, 1 for student
 # C.branch = [2, 2]
 # C.width_mult_list = [4./12, 6./12, 8./12, 10./12, 1.,]
 # C.stem_head_width = [(1, 1), (8./12, 8./12),]
-# C.load_path = "search-224x448_F12.L16_batch2-20200102-123456"
-# C.teacher_path = "train-512x1024_teacher_batch12-20200103-234501"
-# C.load_epoch = "20" # "last" or "int()"
+# C.load_path = "search-224x448_F12.L16_batch2-20200102-123456" # path to the searched directory
+# C.teacher_path = "train-512x1024_teacher_batch12-20200103-234501": which epoch to load from the searched architecture
+# C.load_epoch = "last" # "last" or "int" (e.g. "30")
 # C.batch_size = 12
 # C.Fch = 12
 # C.image_height = 512
 # C.image_width = 1024
-# # C.save = "512x1024_val_batch8_lr1e2_kl.150_600Kiter"
-# C.save = "512x1024_val_batch12_lr1e2_kl.150_teacher.pretrain_600Kiter"
+# C.save = "%dx%d_student_batch%d"%(C.image_height, C.image_width, C.batch_size)
 ########################################
-C.is_test = False
+C.is_test = False # if True, prediction files for the test set will be generated
+C.is_eval = False # if True, the train.py will only do one-time evaluation
+C.eval_path = "" # path to pretrained directory to be evaluated

@@ -120,12 +120,19 @@ def main():
         model = model.cuda()
         init_weight(model, nn.init.kaiming_normal_, torch.nn.BatchNorm2d, config.bn_eps, config.bn_momentum, mode='fan_in', nonlinearity='relu')
 
-        if arch_idx == 0 and len(config.arch_idx) > 1:
-            partial = torch.load(os.path.join(config.teacher_path, "/weights%d.pt"%arch_idx))
+        if config.is_eval:
+            partial = torch.load(os.path.join(config.eval_path, "/weights%d.pt"%arch_idx))
             state = model.state_dict()
             pretrained_dict = {k: v for k, v in partial.items() if k in state}
             state.update(pretrained_dict)
             model.load_state_dict(state)
+        else:
+            if arch_idx == 0 and len(config.arch_idx) > 1:
+                partial = torch.load(os.path.join(config.teacher_path, "/weights%d.pt"%arch_idx))
+                state = model.state_dict()
+                pretrained_dict = {k: v for k, v in partial.items() if k in state}
+                state.update(pretrained_dict)
+                model.load_state_dict(state)
 
         evaluator = SegEvaluator(Cityscapes(data_setting, 'val', None), config.num_classes, config.image_mean,
                                  config.image_std, model, config.eval_scale_array, config.eval_flip, 0, out_idx=0, config=config,
@@ -145,13 +152,25 @@ def main():
 
 
     # Cityscapes ###########################################
+    if config.is_eval:
+        logging.info(config.load_path)
+        logging.info(config.eval_path)
+        logging.info(config.save)
+        # validation
+        tbar.set_description("[validation...]")
+        with torch.no_grad():
+            valid_mIoUs = infer(models, evaluators, logger)
+            for idx, arch_idx in enumerate(config.arch_idx):
+                logger.add_scalar("mIoU/val%d"%arch_idx, valid_mIoUs[idx], epoch)
+                logging.info("valid_mIoU%d %.3f"%(arch_idx, valid_mIoUs[idx]))
+
     tbar = tqdm(range(config.nepochs), ncols=80)
     for epoch in tbar:
         logging.info(config.load_path)
         logging.info(config.save)
         logging.info("lr: " + str(optimizer.param_groups[0]['lr']))
         # training
-        tbar.set_description("[Train][Epoch %d/%d][train...]" % (epoch + 1, config.nepochs))
+        tbar.set_description("[Epoch %d/%d][train...]" % (epoch + 1, config.nepochs))
         train_mIoUs = train(train_loader, models, ohem_criterion, distill_criterion, optimizer, logger, epoch)
         torch.cuda.empty_cache()
         for idx, arch_idx in enumerate(config.arch_idx):
@@ -161,16 +180,16 @@ def main():
 
         # validation
         if not config.is_test and ((epoch+1) % 10 == 0 or epoch == 0):
-            tbar.set_description("[Train][Epoch %d/%d][validation...]" % (epoch + 1, config.nepochs))
+            tbar.set_description("[Epoch %d/%d][validation...]" % (epoch + 1, config.nepochs))
             with torch.no_grad():
-                valid_mIoUs = infer(epoch, models, evaluators, logger)
+                valid_mIoUs = infer(models, evaluators, logger)
                 for idx, arch_idx in enumerate(config.arch_idx):
                     logger.add_scalar("mIoU/val%d"%arch_idx, valid_mIoUs[idx], epoch)
-                    logging.info("[Train]Epoch %d: valid_mIoU%d %.3f"%(epoch, arch_idx, valid_mIoUs[idx]))
+                    logging.info("Epoch %d: valid_mIoU%d %.3f"%(epoch, arch_idx, valid_mIoUs[idx]))
                     save(models[idx], os.path.join(config.save, "weights%d.pt"%arch_idx))
         # test
         if config.is_test and (epoch+1) >= 250 and (epoch+1) % 10 == 0:
-            tbar.set_description("[Train][Epoch %d/%d][test...]" % (epoch + 1, config.nepochs))
+            tbar.set_description("[Epoch %d/%d][test...]" % (epoch + 1, config.nepochs))
             with torch.no_grad():
                 test(epoch, models, testers, logger)
 
@@ -219,7 +238,7 @@ def train(train_loader, models, criterion, distill_criterion, optimizer, logger,
                 loss = loss + criterion(logits8, target)
                 loss = loss + lamb * criterion(logits16, target)
                 loss = loss + lamb * criterion(logits32, target)
-                if len(logits_list) > 1 and epoch >= config.distill_start_epoch:
+                if len(logits_list) > 1:
                     loss = loss + distill_criterion(F.softmax(logits_list[1], dim=1).log(), F.softmax(logits_list[0], dim=1))
 
             metrics[idx].update(logits8.data, target)
@@ -234,7 +253,7 @@ def train(train_loader, models, criterion, distill_criterion, optimizer, logger,
     return [ metric.get_scores() for metric in metrics ]
 
 
-def infer(epoch, models, evaluators, logger):
+def infer(models, evaluators, logger):
     mIoUs = []
     for model, evaluator in zip(models, evaluators):
         model.eval()
