@@ -25,7 +25,7 @@ We present FasterSeg, an automatically designed semantic segmentation network wi
 
 Highlights:
 * **Novel search space**: support multi-resolution branches.
-* **Fine-grained latency regularization**: alleviate the ``architecture collapse'' problem.
+* **Fine-grained latency regularization**: alleviate the "architecture collapse" problem.
 * **Teacher-student co-searching**: distill the teacher to the student for further accuracy boost.
 * **SOTA**: FasterSeg achieves extremely fast speed (over 30\% faster than the closest competitor on CityScapes) and maintains competitive accuracy.
 
