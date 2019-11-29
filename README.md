@@ -2,10 +2,13 @@
 TODO
 BiSeNetHead
 delete: common, lr_scheduler
-latency/seg_ops
-engine/lr_policy
+delete engine/lr_policy
 delete all 8s
 Prepare searched architect and weight in folder
+args in config files
+create a new virenv and test
+latency/seg_ops
+thop latest update
 Latency -->
 # FasterSeg: Searching for Faster Real-time Semantic Segmentation
 
@@ -27,7 +30,8 @@ Highlights:
 * **Novel search space**: support multi-resolution branches.
 * **Fine-grained latency regularization**: alleviate the "architecture collapse" problem.
 * **Teacher-student co-searching**: distill the teacher to the student for further accuracy boost.
-* **SOTA**: FasterSeg achieves extremely fast speed (over 30\% faster than the closest competitor on CityScapes) and maintains competitive accuracy.
+* **SOTA**: FasterSeg achieves extremely fast speed (over 30\% faster than the closest manually designed competitor on CityScapes) and maintains competitive accuracy.
+    - see our Cityscapes submission [here](https://www.cityscapes-dataset.com/edit-submission/?submissionID=5674).
 
 <p align="center">
 <img src="images/table4.png" alt="Cityscapes" width="550"/></br>
@@ -61,8 +65,14 @@ pip install requirements.txt
 * Install [TensorRT](https://github.com/NVIDIA/TensorRT) (v5.1.5.0): a library for high performance inference on NVIDIA GPUs with [Python API](https://docs.nvidia.com/deeplearning/sdk/tensorrt-api/index.html#python).
 
 ## Usage
-* **whole pipeline: pretrain the supernet &rarr; search the archtecture &rarr; train the teacher &rarr; train the student.**
+* **whole pipeline: [pretrain the supernet](https://github.com/chenwydj/FasterSeg#11-pretrain-the-supernet) &rarr; [search the archtecture](https://github.com/chenwydj/FasterSeg#12-search-the-architecture) &rarr; [train the teacher](https://github.com/chenwydj/FasterSeg#21-train-the-teacher-network) &rarr; [train the student](https://github.com/chenwydj/FasterSeg#22-train-the-student-network-fasterseg).**
 * you can monitor the whole process in the Tensorboard.
+
+### 0. Prepare the dataset
+* Download the [leftImg8bit_trainvaltest.zip](https://www.cityscapes-dataset.com/file-handling/?packageID=3) and [gtFine_trainvaltest.zip](https://www.cityscapes-dataset.com/file-handling/?packageID=1) from the Cityscapes.
+* Prepare the annotations by using the [createTrainIdLabelImgs.py](https://github.com/mcordts/cityscapesScripts/blob/master/cityscapesscripts/preparation/createTrainIdLabelImgs.py).
+* Put the [file of image list](furnace/datasets/cityscapes/) into where you save the dataset.
+* Remember to properly set the `C.dataset_path` in the `config` files mentioned below.
 
 ### 1. Search
 ```bash
@@ -90,7 +100,7 @@ CUDA_VISIBLE_DEVICES=0 python train_search.py
 * copy the folder which contains the searched architecture into `FasterSeg/train/` or create a symlink via `ln -s FasterSeg/search/search-224x448_F12.L16_batch2-20200102-123456 FasterSeg/train/search-224x448_F12.L16_batch2-20200102-123456`
 #### 2.1 Train the teacher network
 * uncomment the `## train teacher model only ##` section in `config_train.py` and comment the `## train student with KL distillation from teacher ##` section.
-* set the name of your searched folder (see above) `C.load_path = search-224x448_F12.L16_batch2-20200102-123456`
+* set the name of your searched folder (see above) `C.load_path = "search-224x448_F12.L16_batch2-20200102-123456"` in `config_train.py`.
 * start the teacher's training process:
 ```bash
 CUDA_VISIBLE_DEVICES=0 python train.py
@@ -98,12 +108,33 @@ CUDA_VISIBLE_DEVICES=0 python train.py
 * The trained teacher will be saved in a folder like `train-512x1024_teacher_batch12-20200103-234501`
 #### 2.2 Train the student network (FasterSeg)
 * uncomment the `## train student with KL distillation from teacher ##` section in `config_train.py` and comment the `## train teacher model only ##` section.
-* set the name of your searched folder (see above) `C.load_path = search-224x448_F12.L16_batch2-20200102-123456`.
-* set the name of your teacher's folder (see above) `C.teacher_path = train-512x1024_teacher_batch12-20200103-234501`.
+* set the name of your searched folder (see above) `C.load_path = "search-224x448_F12.L16_batch2-20200102-123456"` in `config_train.py`.
+* set the name of your teacher's folder (see above) `C.teacher_path = "train-512x1024_teacher_batch12-20200103-234501"` in `config_train.py`.
 * start the student's training process:
 ```bash
 CUDA_VISIBLE_DEVICES=0 python train.py
 ```
+
+### 3. Evaluation
+Here we use our pretrained FasterSeg as an example for the evaluation.
+```bash
+cd train
+```
+* set `C.is_eval = True` in `config_train.py`.
+* set the name of the searched folder as `C.load_path = "fasterseg"` in `config_train.py`.
+* download the pretrained weights of the teacher and student [here]().
+* set the name of pretrained directory as `C.eval_path = "/path/to/pretrained/models/"` in `config_train.py`.
+* start the evaluation process:
+```bash
+CUDA_VISIBLE_DEVICES=0 python train.py
+```
+<!-- * you will see the results like (will be also saved in the log file): -->
+
+### 4. Test
+We support generating prediction files (masks as images) during training.
+* set `C.is_test = True` in `config_train.py`.
+* during the training process, the prediction files will be periodically saved in a folder like `train-512x1024_student_batch12-20200104-012345/test_1_#epoch`.
+* simple zip the prediction folder and submit to the [Cityscapes submission page](https://www.cityscapes-dataset.com/login/).
 
 
 ## Citation
