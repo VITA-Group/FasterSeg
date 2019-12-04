@@ -203,7 +203,7 @@ def main(pretrain=True):
                 if config.latency_weight[idx] > 0:
                     if (int(FPSs[idx][0] >= config.FPS_max[idx]) + int(FPSs[idx][1] >= config.FPS_max[idx])) >= 1:
                         architect.latency_weight[idx] /= 2
-                    elif (int(FPSs[idx][0] <= config.FPS_min[idx]) + int(FPSs[idx][1] <= config.FPS_min[idx])) >= 0 and architect.latency_weight[idx] < 0.2:
+                    elif (int(FPSs[idx][0] <= config.FPS_min[idx]) + int(FPSs[idx][1] <= config.FPS_min[idx])) > 0:
                         architect.latency_weight[idx] *= 2
                     logger.add_scalar("arch/latency_weight%d"%idx, architect.latency_weight[idx], epoch+1)
                     logging.info("arch_latency_weight%d = "%idx + str(architect.latency_weight[idx]))
