@@ -10,7 +10,7 @@ from operations import *
 from genotypes import PRIMITIVES
 from pdb import set_trace as bp
 from tqdm import tqdm
-from seg_oprs import AttentionRefinement, FeatureFusion, BiSeNetHead
+from seg_oprs import FeatureFusion, BiSeNetHead
 
 BatchNorm2d = nn.BatchNorm2d
 

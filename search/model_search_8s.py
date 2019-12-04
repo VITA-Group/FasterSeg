@@ -6,7 +6,7 @@ from torch.autograd import Variable
 from genotypes import PRIMITIVES
 # from utils.darts_utils import drop_path, compute_speed, compute_speed_tensorrt
 from pdb import set_trace as bp
-from seg_oprs import AttentionRefinement, FeatureFusion, BiSeNetHead
+from seg_oprs import BiSeNetHead
 import numpy as np
 from thop import profile
 from matplotlib import pyplot as plt
