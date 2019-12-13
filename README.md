@@ -1,10 +1,5 @@
 <!-- 
 TODO
-BiSeNetHead
-delete: common, lr_scheduler
-delete engine/lr_policy
-delete all 8s
-args in config files
 create a new virenv and test
 latency/seg_ops
 thop latest update
@@ -137,6 +132,15 @@ We support generating prediction files (masks as images) during training.
 * during the training process, the prediction files will be periodically saved in a folder like `train-512x1024_student_batch12-20200104-012345/test_1_#epoch`.
 * simple zip the prediction folder and submit to the [Cityscapes submission page](https://www.cityscapes-dataset.com/login/).
 
+### 5. Latency Lookup Table
+To generate the latency lookup table:
+* `cd FasterSeg/latency`
+* Run the script:
+```bash
+CUDA_VISIBLE_DEVICES=0 python latency_lookup_table.py
+```
+which will generate an `.npy` file. Be careful not to overwrite the provided `latency_lookup_table.npy` in this repo.
+* The `.npy` contains a python dictionary mapping from an operator to its latency (in ms) under specific conditions (input size, stride, channel number etc.)
 
 ## Citation
 ```
