@@ -4,7 +4,6 @@ BiSeNetHead
 delete: common, lr_scheduler
 delete engine/lr_policy
 delete all 8s
-Prepare searched architect and weight in folder
 args in config files
 create a new virenv and test
 latency/seg_ops
@@ -99,7 +98,8 @@ CUDA_VISIBLE_DEVICES=0 python train_search.py
 ### 2. Train from scratch
 * copy the folder which contains the searched architecture into `FasterSeg/train/` or create a symlink via `ln -s FasterSeg/search/search-224x448_F12.L16_batch2-20200102-123456 FasterSeg/train/search-224x448_F12.L16_batch2-20200102-123456`
 #### 2.1 Train the teacher network
-* uncomment the `## train teacher model only ##` section in `config_train.py` and comment the `## train student with KL distillation from teacher ##` section.
+* set `C.mode = "teacher"` in `config_train.py`.
+<!-- * uncomment the `## train teacher model only ##` section in `config_train.py` and comment the `## train student with KL distillation from teacher ##` section. -->
 * set the name of your searched folder (see above) `C.load_path = "search-224x448_F12.L16_batch2-20200102-123456"` in `config_train.py`.
 * start the teacher's training process:
 ```bash
@@ -107,7 +107,8 @@ CUDA_VISIBLE_DEVICES=0 python train.py
 ```
 * The trained teacher will be saved in a folder like `train-512x1024_teacher_batch12-20200103-234501`
 #### 2.2 Train the student network (FasterSeg)
-* uncomment the `## train student with KL distillation from teacher ##` section in `config_train.py` and comment the `## train teacher model only ##` section.
+* set `C.mode = "student"` in `config_train.py`.
+<!-- * uncomment the `## train student with KL distillation from teacher ##` section in `config_train.py` and comment the `## train teacher model only ##` section. -->
 * set the name of your searched folder (see above) `C.load_path = "search-224x448_F12.L16_batch2-20200102-123456"` in `config_train.py`.
 * set the name of your teacher's folder (see above) `C.teacher_path = "train-512x1024_teacher_batch12-20200103-234501"` in `config_train.py`.
 * start the student's training process:
@@ -122,8 +123,8 @@ cd train
 ```
 * set `C.is_eval = True` in `config_train.py`.
 * set the name of the searched folder as `C.load_path = "fasterseg"` in `config_train.py`.
-* download the pretrained weights of the teacher and student [here]().
-* set the name of pretrained directory as `C.eval_path = "/path/to/pretrained/models/"` in `config_train.py`.
+* download the pretrained weights of the [teacher](https://drive.google.com/file/d/13qHzblyGTgFaWE1g_B7wX2JzJHZlxnXO/view?usp=sharing) and [student](https://drive.google.com/file/d/1g8D9akVbBWQh0IO8cmC64AQjltJO1x7r/view?usp=sharing) and put them into folder `train/fasterseg`.
+<!-- * set the name of pretrained directory as `C.eval_path = "/path/to/pretrained/models/"` in `config_train.py`. -->
 * start the evaluation process:
 ```bash
 CUDA_VISIBLE_DEVICES=0 python train.py
