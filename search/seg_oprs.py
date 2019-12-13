@@ -17,7 +17,7 @@ import torch.nn as nn
 
 import os.path as osp
 latency_lookup_table = {}
-table_file_name = "latency_lookup_table_8s.npy"
+table_file_name = "latency_lookup_table.npy"
 if osp.isfile(table_file_name):
     latency_lookup_table = np.load(table_file_name).item()
 

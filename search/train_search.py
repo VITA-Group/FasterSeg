@@ -19,7 +19,7 @@ import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 
-from config_search_8s import config
+from config_search import config
 from dataloader import get_train_loader
 from datasets import Cityscapes
 
