@@ -30,7 +30,7 @@ from eval import SegEvaluator
 from test import SegTester
 
 from utils.darts_utils import create_exp_dir, save, plot_op, plot_path_width, objective_acc_lat
-from model_seg_8s import Network_Multi_Path_Infer as Network
+from model_seg import Network_Multi_Path_Infer as Network
 import seg_metrics
 
 
