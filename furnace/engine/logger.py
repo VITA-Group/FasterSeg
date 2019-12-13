@@ -8,9 +8,6 @@ import os
 import sys
 import logging
 
-from utils import pyt_utils
-# from utils.pyt_utils import ensure_dir
-
 _default_level_name = os.getenv('ENGINE_LOGGING_LEVEL', 'INFO')
 _default_level = logging.getLevelName(_default_level_name.upper())
 
@@ -85,7 +82,7 @@ def get_logger(log_dir=None, log_file=None, formatter=LogFormatter):
     del logger.handlers[:]
 
     if log_dir and log_file:
-        pyt_utils.ensure_dir(log_dir)
+        if not os.path.isdir(log_dir): os.makedirs(log_dir)
         LogFormatter.log_fout = True
         file_handler = logging.FileHandler(log_file, mode='a')
         file_handler.setLevel(logging.INFO)
