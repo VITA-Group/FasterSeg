@@ -7,7 +7,7 @@ import numpy as np
 from tqdm import tqdm
 from pdb import set_trace as bp
 from operations import *
-from seg_oprs import FeatureFusion, BiSeNetHead
+from seg_oprs import FeatureFusion, Head
 
 H = 1024
 W = 2048
@@ -114,7 +114,7 @@ Fch_range = [8, 12]
 for Fch in Fch_range:
     for branch in range(1,4):
         print("Fch", Fch, "branch", branch)
-        lookup_table["head_H%d_W%d_Cin%d_Cout%d"%(H//8, W//8, 8*Fch*branch, 19)] = BiSeNetHead._latency(H//8, W//8, 8*Fch*branch, 19)
+        lookup_table["head_H%d_W%d_Cin%d_Cout%d"%(H//8, W//8, 8*Fch*branch, 19)] = Head._latency(H//8, W//8, 8*Fch*branch, 19)
         np.save(file_name, lookup_table)
 
 

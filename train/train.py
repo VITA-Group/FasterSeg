@@ -124,13 +124,13 @@ def main():
         init_weight(model, nn.init.kaiming_normal_, torch.nn.BatchNorm2d, config.bn_eps, config.bn_momentum, mode='fan_in', nonlinearity='relu')
 
         if arch_idx == 0 and len(config.arch_idx) > 1:
-            partial = torch.load(os.path.join(config.teacher_path, "/weights%d.pt"%arch_idx))
+            partial = torch.load(os.path.join(config.teacher_path, "weights%d.pt"%arch_idx))
             state = model.state_dict()
             pretrained_dict = {k: v for k, v in partial.items() if k in state}
             state.update(pretrained_dict)
             model.load_state_dict(state)
         elif config.is_eval:
-            partial = torch.load(os.path.join(config.eval_path, "/weights%d.pt"%arch_idx))
+            partial = torch.load(os.path.join(config.eval_path, "weights%d.pt"%arch_idx))
             state = model.state_dict()
             pretrained_dict = {k: v for k, v in partial.items() if k in state}
             state.update(pretrained_dict)

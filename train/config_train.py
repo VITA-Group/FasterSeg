@@ -114,5 +114,5 @@ elif C.mode == "student":
 
 ########################################
 C.is_test = False # if True, prediction files for the test set will be generated
-C.is_eval = False # if True, the train.py will only do evaluation for once
+C.is_eval = True # if True, the train.py will only do evaluation for once
 C.eval_path = "fasterseg" # path to pretrained directory to be evaluated

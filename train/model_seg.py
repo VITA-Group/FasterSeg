@@ -10,7 +10,7 @@ from operations import *
 from genotypes import PRIMITIVES
 from pdb import set_trace as bp
 from tqdm import tqdm
-from seg_oprs import FeatureFusion, BiSeNetHead
+from seg_oprs import FeatureFusion, Head
 
 BatchNorm2d = nn.BatchNorm2d
 
@@ -221,14 +221,14 @@ class Network_Multi_Path_Infer(nn.Module):
     def build_arm_ffm_head(self):
         if self.training:
             if 2 in self.lasts:
-                self.heads32 = BiSeNetHead(self.num_filters(32, self._stem_head_width[1]), self._num_classes, True, norm_layer=BatchNorm2d)
+                self.heads32 = Head(self.num_filters(32, self._stem_head_width[1]), self._num_classes, True, norm_layer=BatchNorm2d)
                 if 1 in self.lasts:
-                    self.heads16 = BiSeNetHead(self.num_filters(16, self._stem_head_width[1])+self.ch_16, self._num_classes, True, norm_layer=BatchNorm2d)
+                    self.heads16 = Head(self.num_filters(16, self._stem_head_width[1])+self.ch_16, self._num_classes, True, norm_layer=BatchNorm2d)
                 else:
-                    self.heads16 = BiSeNetHead(self.num_filters(16, self._stem_head_width[1]), self._num_classes, True, norm_layer=BatchNorm2d)
+                    self.heads16 = Head(self.num_filters(16, self._stem_head_width[1]), self._num_classes, True, norm_layer=BatchNorm2d)
             else:
-                self.heads16 = BiSeNetHead(self.num_filters(16, self._stem_head_width[1]), self._num_classes, True, norm_layer=BatchNorm2d)
-        self.heads8 = BiSeNetHead(self.num_filters(8, self._stem_head_width[1]) * self._branch, self._num_classes, Fch=self._Fch, scale=4, branch=self._branch, is_aux=False, norm_layer=BatchNorm2d)
+                self.heads16 = Head(self.num_filters(16, self._stem_head_width[1]), self._num_classes, True, norm_layer=BatchNorm2d)
+        self.heads8 = Head(self.num_filters(8, self._stem_head_width[1]) * self._branch, self._num_classes, Fch=self._Fch, scale=4, branch=self._branch, is_aux=False, norm_layer=BatchNorm2d)
 
         if 2 in self.lasts:
             self.arms32 = nn.ModuleList([

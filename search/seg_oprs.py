@@ -231,9 +231,9 @@ class FeatureFusion(nn.Module):
         return output
 
 
-class BiSeNetHead(nn.Module):
+class Head(nn.Module):
     def __init__(self, in_planes, out_planes=19, Fch=16, scale=4, branch=2, is_aux=False, norm_layer=nn.BatchNorm2d):
-        super(BiSeNetHead, self).__init__()
+        super(Head, self).__init__()
         if in_planes <= 64:
             mid_planes = in_planes
         elif in_planes <= 256:
@@ -256,7 +256,7 @@ class BiSeNetHead(nn.Module):
 
     @staticmethod
     def _latency(h, w, C_in, C_out=19):
-        layer = BiSeNetHead(C_in, C_out)
+        layer = Head(C_in, C_out)
         latency = compute_latency(layer, (1, C_in, h, w))
         return latency
 
@@ -268,7 +268,7 @@ class BiSeNetHead(nn.Module):
             return latency, (self._out_planes, size[1], size[2])
         else:
             print("not found in latency_lookup_table:", name)
-            latency = BiSeNetHead._latency(size[1], size[2], self._scale*self._Fch*self._branch, self._out_planes)
+            latency = Head._latency(size[1], size[2], self._scale*self._Fch*self._branch, self._out_planes)
             latency_lookup_table[name] = latency
             np.save("latency_lookup_table.npy", latency_lookup_table)
             return latency, (self._out_planes, size[1], size[2])

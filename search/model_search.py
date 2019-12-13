@@ -6,7 +6,7 @@ from torch.autograd import Variable
 from genotypes import PRIMITIVES
 # from utils.darts_utils import drop_path, compute_speed, compute_speed_tensorrt
 from pdb import set_trace as bp
-from seg_oprs import BiSeNetHead
+from seg_oprs import Head
 import numpy as np
 from thop import profile
 from matplotlib import pyplot as plt
@@ -182,11 +182,11 @@ class Network_Multi_Path(nn.Module):
                 ConvNorm(self.num_filters(16, head_ratio), self.num_filters(8, head_ratio), kernel_size=1, bias=False, groups=1, slimmable=False),
                 ConvNorm(self.num_filters(16, head_ratio), self.num_filters(8, head_ratio), kernel_size=3, padding=1, bias=False, groups=1, slimmable=False)]) for _, head_ratio in self._stem_head_width ])
 
-        self.head0 = nn.ModuleList([ BiSeNetHead(self.num_filters(8, head_ratio), num_classes, False) for _, head_ratio in self._stem_head_width ])
-        self.head1 = nn.ModuleList([ BiSeNetHead(self.num_filters(8, head_ratio), num_classes, False) for _, head_ratio in self._stem_head_width ])
-        self.head2 = nn.ModuleList([ BiSeNetHead(self.num_filters(8, head_ratio), num_classes, False) for _, head_ratio in self._stem_head_width ])
-        self.head02 = nn.ModuleList([ BiSeNetHead(self.num_filters(8, head_ratio)*2, num_classes, False) for _, head_ratio in self._stem_head_width ])
-        self.head12 = nn.ModuleList([ BiSeNetHead(self.num_filters(8, head_ratio)*2, num_classes, False) for _, head_ratio in self._stem_head_width ])
+        self.head0 = nn.ModuleList([ Head(self.num_filters(8, head_ratio), num_classes, False) for _, head_ratio in self._stem_head_width ])
+        self.head1 = nn.ModuleList([ Head(self.num_filters(8, head_ratio), num_classes, False) for _, head_ratio in self._stem_head_width ])
+        self.head2 = nn.ModuleList([ Head(self.num_filters(8, head_ratio), num_classes, False) for _, head_ratio in self._stem_head_width ])
+        self.head02 = nn.ModuleList([ Head(self.num_filters(8, head_ratio)*2, num_classes, False) for _, head_ratio in self._stem_head_width ])
+        self.head12 = nn.ModuleList([ Head(self.num_filters(8, head_ratio)*2, num_classes, False) for _, head_ratio in self._stem_head_width ])
 
         # contains arch_param names: {"alphas": alphas, "betas": betas, "ratios": ratios}
         self._arch_names = []
