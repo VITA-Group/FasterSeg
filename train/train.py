@@ -16,8 +16,11 @@ from tensorboardX import SummaryWriter
 import numpy as np
 from thop import profile
 
-from config_train_student import config
-config.save = 'train-{}-{}'.format(config.save, time.strftime("%Y%m%d-%H%M%S"))
+from config_train import config
+if config.is_eval:
+    config.save = 'eval-{}-{}'.format(config.save, time.strftime("%Y%m%d-%H%M%S"))
+else:
+    config.save = 'train-{}-{}'.format(config.save, time.strftime("%Y%m%d-%H%M%S"))
 from dataloader import get_train_loader
 from datasets import Cityscapes
 
@@ -120,19 +123,18 @@ def main():
         model = model.cuda()
         init_weight(model, nn.init.kaiming_normal_, torch.nn.BatchNorm2d, config.bn_eps, config.bn_momentum, mode='fan_in', nonlinearity='relu')
 
-        if config.is_eval:
+        if arch_idx == 0 and len(config.arch_idx) > 1:
+            partial = torch.load(os.path.join(config.teacher_path, "/weights%d.pt"%arch_idx))
+            state = model.state_dict()
+            pretrained_dict = {k: v for k, v in partial.items() if k in state}
+            state.update(pretrained_dict)
+            model.load_state_dict(state)
+        elif config.is_eval:
             partial = torch.load(os.path.join(config.eval_path, "/weights%d.pt"%arch_idx))
             state = model.state_dict()
             pretrained_dict = {k: v for k, v in partial.items() if k in state}
             state.update(pretrained_dict)
             model.load_state_dict(state)
-        else:
-            if arch_idx == 0 and len(config.arch_idx) > 1:
-                partial = torch.load(os.path.join(config.teacher_path, "/weights%d.pt"%arch_idx))
-                state = model.state_dict()
-                pretrained_dict = {k: v for k, v in partial.items() if k in state}
-                state.update(pretrained_dict)
-                model.load_state_dict(state)
 
         evaluator = SegEvaluator(Cityscapes(data_setting, 'val', None), config.num_classes, config.image_mean,
                                  config.image_std, model, config.eval_scale_array, config.eval_flip, 0, out_idx=0, config=config,
@@ -157,12 +159,17 @@ def main():
         logging.info(config.eval_path)
         logging.info(config.save)
         # validation
-        tbar.set_description("[validation...]")
+        print("[validation...]")
         with torch.no_grad():
             valid_mIoUs = infer(models, evaluators, logger)
             for idx, arch_idx in enumerate(config.arch_idx):
-                logger.add_scalar("mIoU/val%d"%arch_idx, valid_mIoUs[idx], epoch)
-                logging.info("valid_mIoU%d %.3f"%(arch_idx, valid_mIoUs[idx]))
+                if arch_idx == 0:
+                    logger.add_scalar("mIoU/val_teacher", valid_mIoUs[idx], 0)
+                    logging.info("teacher's valid_mIoU %.3f"%(valid_mIoUs[idx]))
+                else:
+                    logger.add_scalar("mIoU/val_student", valid_mIoUs[idx], 0)
+                    logging.info("student's valid_mIoU %.3f"%(valid_mIoUs[idx]))
+        exit(0)
 
     tbar = tqdm(range(config.nepochs), ncols=80)
     for epoch in tbar:
@@ -174,8 +181,12 @@ def main():
         train_mIoUs = train(train_loader, models, ohem_criterion, distill_criterion, optimizer, logger, epoch)
         torch.cuda.empty_cache()
         for idx, arch_idx in enumerate(config.arch_idx):
-            logger.add_scalar("mIoU/train%d"%arch_idx, train_mIoUs[idx], epoch)
-            logging.info("train_mIoU%d %.3f"%(arch_idx, train_mIoUs[idx]))
+            if arch_idx == 0:
+                logger.add_scalar("mIoU/train_teacher", train_mIoUs[idx], epoch)
+                logging.info("teacher's train_mIoU %.3f"%(train_mIoUs[idx]))
+            else:
+                logger.add_scalar("mIoU/train_student", train_mIoUs[idx], epoch)
+                logging.info("student's train_mIoU %.3f"%(train_mIoUs[idx]))
         adjust_learning_rate(base_lr, 0.992, optimizer, epoch+1, config.nepochs)
 
         # validation
@@ -184,8 +195,12 @@ def main():
             with torch.no_grad():
                 valid_mIoUs = infer(models, evaluators, logger)
                 for idx, arch_idx in enumerate(config.arch_idx):
-                    logger.add_scalar("mIoU/val%d"%arch_idx, valid_mIoUs[idx], epoch)
-                    logging.info("Epoch %d: valid_mIoU%d %.3f"%(epoch, arch_idx, valid_mIoUs[idx]))
+                    if arch_idx == 0:
+                        logger.add_scalar("mIoU/val_teacher", valid_mIoUs[idx], epoch)
+                        logging.info("teacher's valid_mIoU %.3f"%(valid_mIoUs[idx]))
+                    else:
+                        logger.add_scalar("mIoU/val_student", valid_mIoUs[idx], epoch)
+                        logging.info("student's valid_mIoU %.3f"%(valid_mIoUs[idx]))
                     save(models[idx], os.path.join(config.save, "weights%d.pt"%arch_idx))
         # test
         if config.is_test and (epoch+1) >= 250 and (epoch+1) % 10 == 0:
