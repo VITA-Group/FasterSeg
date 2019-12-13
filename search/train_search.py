@@ -29,8 +29,8 @@ from eval import SegEvaluator
 
 from architect import Architect, arch_threshold
 from utils.darts_utils import create_exp_dir, save, plot_op, plot_path_width, objective_acc_lat
-from model_search_8s import Network_Multi_Path as Network
-from model_seg_8s import Network_Multi_Path_Infer
+from model_search import Network_Multi_Path as Network
+from model_seg import Network_Multi_Path_Infer
 import seg_metrics
 
 
