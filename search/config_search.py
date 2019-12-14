@@ -21,15 +21,6 @@ C.repo_name = 'FasterSeg'
 C.abs_dir = osp.realpath(".")
 C.this_dir = C.abs_dir.split(osp.sep)[-1]
 C.root_dir = C.abs_dir[:C.abs_dir.index(C.repo_name) + len(C.repo_name)]
-C.log_dir = osp.abspath(osp.join(C.root_dir, 'log', C.this_dir))
-C.log_dir_link = osp.join(C.abs_dir, 'log')
-C.snapshot_dir = osp.abspath(osp.join(C.log_dir, "snapshot"))
-
-exp_time = time.strftime('%Y_%m_%d_%H_%M_%S', time.localtime())
-C.log_file = C.log_dir + '/log_' + exp_time + '.log'
-C.link_log_file = C.log_file + '/log_last.log'
-C.val_log_file = C.log_dir + '/val_' + exp_time + '.log'
-C.link_val_log_file = C.log_dir + '/val_last.log'
 
 """Data Dir and Weight Dir"""
 C.dataset_path = "/ssd1/chenwy/cityscapes/"
@@ -44,14 +35,13 @@ def add_path(path):
     if path not in sys.path:
         sys.path.insert(0, path)
 
-add_path(osp.join(C.root_dir, 'furnace'))
+add_path(osp.join(C.root_dir, 'tools'))
 
 """Image Config"""
 C.num_classes = 19
 C.background = -1
 C.image_mean = np.array([0.485, 0.456, 0.406])
 C.image_std = np.array([0.229, 0.224, 0.225])
-C.target_size = 1024
 C.down_sampling = 2 # first down_sampling then crop ......
 C.image_height = 160 # this size is after down_sampling
 C.image_width = 160*2

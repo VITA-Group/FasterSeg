@@ -18,7 +18,7 @@ def add_path(path):
     if path not in sys.path:
         sys.path.insert(0, path)
 
-add_path(osp.join(C.root_dir, 'furnace'))
+add_path(osp.join(C.root_dir, 'tools'))
 try:
     from utils.darts_utils import compute_latency_ms_tensorrt as compute_latency
     print("use TensorRT for latency test")
