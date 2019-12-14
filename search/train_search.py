@@ -18,6 +18,7 @@ import matplotlib
 # Force matplotlib to not use any Xwindows backend.
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
+from thop import profile
 
 from config_search import config
 from dataloader import get_train_loader
@@ -27,7 +28,7 @@ from utils.init_func import init_weight
 from seg_opr.loss_opr import ProbOhemCrossEntropy2d
 from eval import SegEvaluator
 
-from architect import Architect, arch_threshold
+from architect import Architect
 from utils.darts_utils import create_exp_dir, save, plot_op, plot_path_width, objective_acc_lat
 from model_search import Network_Multi_Path as Network
 from model_seg import Network_Multi_Path_Infer
@@ -65,6 +66,8 @@ def main(pretrain=True):
 
     # Model #######################################
     model = Network(config.num_classes, config.layers, ohem_criterion, Fch=config.Fch, width_mult_list=config.width_mult_list, prun_modes=config.prun_modes, stem_head_width=config.stem_head_width)
+    flops, params = profile(model, inputs=(torch.randn(1, 3, 1024, 2048),))
+    logging.info("params = %fMB, FLOPs = %fGB", params / 1e6, flops / 1e9)
     model = model.cuda()
     if type(pretrain) == str:
         partial = torch.load(pretrain + "/weights.pt", map_location='cuda:0')
@@ -77,7 +80,6 @@ def main(pretrain=True):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
     architect = Architect(model, config)
-    logging.info("param size = %fMB", count_parameters_in_MB(model))
 
     # Optimizer ###################################
     base_lr = config.lr
@@ -107,8 +109,8 @@ def main(pretrain=True):
                     'train_source': config.train_source,
                     'eval_source': config.eval_source,
                     'down_sampling': config.down_sampling}
-    train_loader_model, train_sampler_model = get_train_loader(engine, config, Cityscapes, portion=config.train_portion)
-    train_loader_arch, train_sampler_arch = get_train_loader(engine, config, Cityscapes, portion=config.train_portion-1)#, worker=0)
+    train_loader_model, train_sampler_model = get_train_loader(config, Cityscapes, portion=config.train_portion)
+    train_loader_arch, train_sampler_arch = get_train_loader(config, Cityscapes, portion=config.train_portion-1)#, worker=0)
 
     evaluator = SegEvaluator(Cityscapes(data_setting, 'val', None), config.num_classes, config.image_mean,
                              config.image_std, model, config.eval_scale_array, config.eval_flip, 0, config=config,
@@ -119,10 +121,11 @@ def main(pretrain=True):
             logger.add_scalar("arch/latency_weight%d"%idx, config.latency_weight[idx], 0)
             logging.info("arch_latency_weight%d = "%idx + str(config.latency_weight[idx]))
 
-    # tbar = tqdm(range(engine.state.epoch, config.nepochs), ncols=80)
     tbar = tqdm(range(config.nepochs), ncols=80)
     valid_mIoU_history = []; FPSs_history = [];
     latency_supernet_history = []; latency_weight_history = [];
+    valid_names = ["8s", "16s", "32s", "8s_32s", "16s_32s"]
+    arch_names = {0: "teacher", 1: "student"}
     for epoch in tbar:
         logging.info(pretrain)
         logging.info(config.save)
@@ -132,7 +135,7 @@ def main(pretrain=True):
 
         # training
         tbar.set_description("[Epoch %d/%d][train...]" % (epoch + 1, config.nepochs))
-        train(engine, pretrain, train_loader_model, train_loader_arch, model, architect, ohem_criterion, optimizer, lr_policy, logger, epoch, update_arch=update_arch)
+        train(pretrain, train_loader_model, train_loader_arch, model, architect, ohem_criterion, optimizer, lr_policy, logger, epoch, update_arch=update_arch)
         torch.cuda.empty_cache()
         lr_policy.step()
 
@@ -143,19 +146,19 @@ def main(pretrain=True):
                 model.prun_mode = "min"
                 valid_mIoUs = infer(epoch, model, evaluator, logger, FPS=False)
                 for i in range(5):
-                    logger.add_scalar('mIoU/val_min_%d'%i, valid_mIoUs[i], epoch)
-                    logging.info("Epoch %d: valid_mIoU_min_%d %.3f"%(epoch, i, valid_mIoUs[i]))
+                    logger.add_scalar('mIoU/val_min_%s'%valid_names[i], valid_mIoUs[i], epoch)
+                    logging.info("Epoch %d: valid_mIoU_min_%s %.3f"%(epoch, valid_names[i], valid_mIoUs[i]))
                 if len(model._width_mult_list) > 1:
                     model.prun_mode = "max"
                     valid_mIoUs = infer(epoch, model, evaluator, logger, FPS=False)
                     for i in range(5):
-                        logger.add_scalar('mIoU/val_max_%d'%i, valid_mIoUs[i], epoch)
-                        logging.info("Epoch %d: valid_mIoU_max_%d %.3f"%(epoch, i, valid_mIoUs[i]))
+                        logger.add_scalar('mIoU/val_max_%s'%valid_names[i], valid_mIoUs[i], epoch)
+                        logging.info("Epoch %d: valid_mIoU_max_%s %.3f"%(epoch, valid_names[i], valid_mIoUs[i]))
                     model.prun_mode = "random"
                     valid_mIoUs = infer(epoch, model, evaluator, logger, FPS=False)
                     for i in range(5):
-                        logger.add_scalar('mIoU/val_random_%d'%i, valid_mIoUs[i], epoch)
-                        logging.info("Epoch %d: valid_mIoU_random_%d %.3f"%(epoch, i, valid_mIoUs[i]))
+                        logger.add_scalar('mIoU/val_random_%s'%valid_names[i], valid_mIoUs[i], epoch)
+                        logging.info("Epoch %d: valid_mIoU_random_%s %.3f"%(epoch, valid_names[i], valid_mIoUs[i]))
             else:
                 valid_mIoUss = []; FPSs = []
                 model.prun_mode = None
@@ -167,13 +170,13 @@ def main(pretrain=True):
                     FPSs.append([fps0, fps1])
                     for i in range(5):
                         # preds
-                        logger.add_scalar('mIoU/val_%d_%d'%(idx, i), valid_mIoUs[i], epoch)
-                        logging.info("Epoch %d: valid_mIoU_%d_%d %.3f"%(epoch, idx, i, valid_mIoUs[i]))
+                        logger.add_scalar('mIoU/val_%s_%s'%(arch_names[idx], valid_names[i]), valid_mIoUs[i], epoch)
+                        logging.info("Epoch %d: valid_mIoU_%s_%s %.3f"%(epoch, arch_names[idx], valid_names[i], valid_mIoUs[i]))
                     if config.latency_weight[idx] > 0:
-                        logger.add_scalar('Objective/val_%d_02'%idx, objective_acc_lat(valid_mIoUs[3], 1000./fps0), epoch)
-                        logging.info("Epoch %d: Objective_%d_02 %.3f"%(epoch, idx, objective_acc_lat(valid_mIoUs[3], 1000./fps0)))
-                        logger.add_scalar('Objective/val_%d_12'%idx, objective_acc_lat(valid_mIoUs[4], 1000./fps1), epoch)
-                        logging.info("Epoch %d: Objective_%d_12 %.3f"%(epoch, idx, objective_acc_lat(valid_mIoUs[4], 1000./fps1)))
+                        logger.add_scalar('Objective/val_%s_8s_32s'%arch_names[idx], objective_acc_lat(valid_mIoUs[3], 1000./fps0), epoch)
+                        logging.info("Epoch %d: Objective_%s_8s_32s %.3f"%(epoch, arch_names[idx], objective_acc_lat(valid_mIoUs[3], 1000./fps0)))
+                        logger.add_scalar('Objective/val_%s_16s_32s'%arch_names[idx], objective_acc_lat(valid_mIoUs[4], 1000./fps1), epoch)
+                        logging.info("Epoch %d: Objective_%s_16s_32s %.3f"%(epoch, arch_names[idx], objective_acc_lat(valid_mIoUs[4], 1000./fps1)))
                 valid_mIoU_history.append(valid_mIoUss)
                 FPSs_history.append(FPSs)
                 if update_arch:
@@ -181,22 +184,23 @@ def main(pretrain=True):
                 latency_weight_history.append(architect.latency_weight)
 
         save(model, os.path.join(config.save, 'weights.pt'))
-        # contains arch_param names: {"alphas": alphas, "betas": betas, "gammas": gammas, "ratios": ratios}
-        for idx, arch_name in enumerate(model._arch_names):
-            state = {}
-            for name in arch_name['alphas']:
-                state[name] = getattr(model, name)
-            for name in arch_name['betas']:
-                state[name] = getattr(model, name)
-            for name in arch_name['ratios']:
-                state[name] = getattr(model, name)
-            state["mIoU02"] = valid_mIoUs[3]
-            state["mIoU12"] = valid_mIoUs[4]
-            if pretrain is not True:
-                state["latency02"] = 1000. / fps0
-                state["latency12"] = 1000. / fps1
-            torch.save(state, os.path.join(config.save, "arch_%d_%d.pt"%(idx, epoch)))
-            torch.save(state, os.path.join(config.save, "arch_%d.pt"%(idx)))
+        if type(pretrain) == str:
+            # contains arch_param names: {"alphas": alphas, "betas": betas, "gammas": gammas, "ratios": ratios}
+            for idx, arch_name in enumerate(model._arch_names):
+                state = {}
+                for name in arch_name['alphas']:
+                    state[name] = getattr(model, name)
+                for name in arch_name['betas']:
+                    state[name] = getattr(model, name)
+                for name in arch_name['ratios']:
+                    state[name] = getattr(model, name)
+                state["mIoU02"] = valid_mIoUs[3]
+                state["mIoU12"] = valid_mIoUs[4]
+                if pretrain is not True:
+                    state["latency02"] = 1000. / fps0
+                    state["latency12"] = 1000. / fps1
+                torch.save(state, os.path.join(config.save, "arch_%d_%d.pt"%(idx, epoch)))
+                torch.save(state, os.path.join(config.save, "arch_%d.pt"%(idx)))
 
         if update_arch:
             for idx in range(len(config.latency_weight)):
@@ -205,11 +209,11 @@ def main(pretrain=True):
                         architect.latency_weight[idx] /= 2
                     elif (int(FPSs[idx][0] <= config.FPS_min[idx]) + int(FPSs[idx][1] <= config.FPS_min[idx])) > 0:
                         architect.latency_weight[idx] *= 2
-                    logger.add_scalar("arch/latency_weight%d"%idx, architect.latency_weight[idx], epoch+1)
-                    logging.info("arch_latency_weight%d = "%idx + str(architect.latency_weight[idx]))
+                    logger.add_scalar("arch/latency_weight_%s"%arch_names[idx], architect.latency_weight[idx], epoch+1)
+                    logging.info("arch_latency_weight_%d = "%arch_names[idx] + str(architect.latency_weight[idx]))
 
 
-def train(engine, pretrain, train_loader_model, train_loader_arch, model, architect, criterion, optimizer, lr_policy, logger, epoch, update_arch=True):
+def train(pretrain, train_loader_model, train_loader_arch, model, architect, criterion, optimizer, lr_policy, logger, epoch, update_arch=True):
     model.train()
 
     bar_format = '{desc}[{elapsed}<{remaining},{rate_fmt}]'

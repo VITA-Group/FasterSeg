@@ -34,7 +34,7 @@ class TrainPre(object):
         return p_img, p_gt, extra_dict
 
 
-def get_train_loader(engine, config, dataset, portion=None, worker=None):
+def get_train_loader(config, dataset, portion=None, worker=None):
     data_setting = {'img_root': config.img_root_folder,
                     'gt_root': config.gt_root_folder,
                     'train_source': config.train_source,

@@ -3,7 +3,6 @@ import numpy as np
 import torch.nn as nn
 from torch.nn import functional as F
 from torch.autograd import Variable
-import torchcontrib
 import numpy as np
 from pdb import set_trace as bp
 from thop import profile
@@ -50,19 +49,15 @@ class Architect(object):
         if unrolled:
                 loss = self._backward_step_unrolled(input_train, target_train, input_valid, target_valid, eta, network_optimizer)
         else:
-                loss, loss_kl, loss_latency = self._backward_step(input_valid, target_valid)
-        loss.backward(retain_graph=True)
-        bp()
-        if loss_latency != 0: loss_latency.backward(retain_graph=True)
+                loss, loss_latency = self._backward_step(input_valid, target_valid)
+        loss.backward()
+        if loss_latency != 0: loss_latency.backward()
         for optimizer in self.optimizers:
             optimizer.step()
-        if loss_kl != 0:
-            loss_kl.backward()
-            self.optimizers[1].step()
-        return loss + loss_kl + loss_latency
+        return loss + loss_latency
 
     def _backward_step(self, input_valid, target_valid):
-        loss, loss_kl = self.model._loss(input_valid, target_valid)
+        loss = self.model._loss(input_valid, target_valid)
         loss_latency = 0
         self.latency_supernet = 0
         self.model.prun_mode = None
@@ -70,10 +65,8 @@ class Architect(object):
             self.model.arch_idx = idx
             if self.latency_weight[idx] > 0:
                 latency = 0
-                # latency = self.model.forward_latency((3, 1024, 2048))
                 if len(self.model._width_mult_list) == 1:
-                    # r0 = 1./100; r1 = 99./100
-                    # r0 = 1./500; r1 = 499./500
+                    r0 = 1./500; r1 = 499./500
                     latency = latency + r0 * self.model.forward_latency((3, 1024, 2048), alpha=True, beta=False, ratio=False)
                     latency = latency + r1 * self.model.forward_latency((3, 1024, 2048), alpha=False, beta=True, ratio=False)
                 else:
@@ -81,14 +74,10 @@ class Architect(object):
                     latency = latency + r0 * self.model.forward_latency((3, 1024, 2048), alpha=True, beta=False, ratio=False)
                     latency = latency + r1 * self.model.forward_latency((3, 1024, 2048), alpha=False, beta=True, ratio=False)
                     latency = latency + r2 * self.model.forward_latency((3, 1024, 2048), alpha=False, beta=False, ratio=True)
-                    # latency = latency + self.model.forward_latency((3, 1024, 2048), alpha=True, beta=True, ratio=True)
-                # TODO currently only record latency of the last arch_idx...
                 self.latency_supernet = latency
                 loss_latency = loss_latency + latency * self.latency_weight[idx]
 
-        # loss.backward(retain_graph=True)
-        # loss.backward()
-        return loss, loss_kl, loss_latency
+        return loss, loss_latency
 
     def _backward_step_unrolled(self, input_train, target_train, input_valid, target_valid, eta, network_optimizer):
         unrolled_model = self._compute_unrolled_model(input_train, target_train, eta, network_optimizer)
