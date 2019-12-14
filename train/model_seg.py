@@ -311,19 +311,16 @@ class Network_Multi_Path_Infer(nn.Module):
                 if self.training: pred32.append(outputs32[branch])
                 out = self.arms32[0](outputs32[branch])
                 out = F.interpolate(out, size=(int(out.size(2))*2, int(out.size(3))*2), mode='bilinear', align_corners=True)
-                # out = F.interpolate(out, size=(int(out.size(2))*2, int(out.size(3))*2), mode='nearest')
                 out = self.refines32[0](torch.cat([out, outputs16[branch]], dim=1))
                 if self.training: pred16.append(outputs16[branch])
                 out = self.arms32[1](out)
                 out = F.interpolate(out, size=(int(out.size(2))*2, int(out.size(3))*2), mode='bilinear', align_corners=True)
-                # out = F.interpolate(out, size=(int(out.size(2))*2, int(out.size(3))*2), mode='nearest')
                 out = self.refines32[1](torch.cat([out, outputs8[branch]], dim=1))
                 pred8.append(out)
             elif last == 1:
                 if self.training: pred16.append(outputs16[branch])
                 out = self.arms16(outputs16[branch])
                 out = F.interpolate(out, size=(int(out.size(2))*2, int(out.size(3))*2), mode='bilinear', align_corners=True)
-                # out = F.interpolate(out, size=(int(out.size(2))*2, int(out.size(3))*2), mode='nearest')
                 out = self.refines16(torch.cat([out, outputs8[branch]], dim=1))
                 pred8.append(out)
             elif last == 0:
@@ -386,7 +383,6 @@ class Network_Multi_Path_Infer(nn.Module):
                 return x
             else:
                 out = F.interpolate(pred8, size=(int(pred8.size(2))*8, int(pred8.size(3))*8), mode='bilinear', align_corners=True)
-                # out = F.interpolate(pred8, size=(int(pred8.size(2))*8, int(pred8.size(3))*8), mode='nearest')
                 return out
     
     def forward_latency(self, size):
