@@ -117,7 +117,7 @@ cd train
 ```
 * Set `C.is_eval = True` in `config_train.py`.
 * Set the name of the searched folder as `C.load_path = "fasterseg"` in `config_train.py`.
-* Download the pretrained weights of the [teacher](https://drive.google.com/file/d/13qHzblyGTgFaWE1g_B7wX2JzJHZlxnXO/view?usp=sharing) and [student](https://drive.google.com/file/d/1g8D9akVbBWQh0IO8cmC64AQjltJO1x7r/view?usp=sharing) and put them into folder `train/fasterseg`.
+* Download the pretrained weights of the [teacher](https://drive.google.com/file/d/13qHzblyGTgFaWE1g_B7wX2JzJHZlxnXO/view?usp=sharing) and [student](https://drive.google.com/file/d/17lHJDibeDQBRKZtrVsuJhUYnyUVS2Hje/view?usp=sharing) and put them into folder `train/fasterseg`.
 <!-- * set the name of pretrained directory as `C.eval_path = "/path/to/pretrained/models/"` in `config_train.py`. -->
 * Start the evaluation process:
 ```bash
