@@ -40,7 +40,7 @@ Highlights:
 - Python 3
 - NVIDIA GPU + CUDA CuDNN
 
-Note that our experiments are done on NVIDIA GTX 1080Ti. Configurations (e.g batch size, image patch size) may need to be changed on different platforms.
+This repository has been tested on GTX 1808Ti. Configurations (e.g batch size, image patch size) may need to be changed on different platforms.
 
 ## Installation
 * Clone this repo:
@@ -133,6 +133,11 @@ We support generating prediction files (masks as images) during training.
 * Simply zip the prediction folder and submit to the [Cityscapes submission page](https://www.cityscapes-dataset.com/login/).
 
 ### 5. Latency Lookup Table
+
+#### 5.0 Latency measurement tools
+* If you have successfully installed [TensorRT](https://github.com/chenwydj/FasterSeg#installation), you will automatically use TensorRT for the following latency tests (see [function](https://github.com/chenwydj/FasterSeg/blob/master/tools/utils/darts_utils.py#L167) here).
+* Otherwise you will be switched to use Pytorch for the latency tests  (see [function](https://github.com/chenwydj/FasterSeg/blob/master/tools/utils/darts_utils.py#L184) here).
+
 #### 5.1 Measure the latency of the FasterSeg
 * Run the script:
 ```bash
