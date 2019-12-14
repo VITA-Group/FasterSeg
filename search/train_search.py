@@ -210,7 +210,7 @@ def main(pretrain=True):
                     elif (int(FPSs[idx][0] <= config.FPS_min[idx]) + int(FPSs[idx][1] <= config.FPS_min[idx])) > 0:
                         architect.latency_weight[idx] *= 2
                     logger.add_scalar("arch/latency_weight_%s"%arch_names[idx], architect.latency_weight[idx], epoch+1)
-                    logging.info("arch_latency_weight_%d = "%arch_names[idx] + str(architect.latency_weight[idx]))
+                    logging.info("arch_latency_weight_%s = "%arch_names[idx] + str(architect.latency_weight[idx]))
 
 
 def train(pretrain, train_loader_model, train_loader_arch, model, architect, criterion, optimizer, lr_policy, logger, epoch, update_arch=True):

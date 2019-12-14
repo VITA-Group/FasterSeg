@@ -220,7 +220,7 @@ class Network_Multi_Path_Infer(nn.Module):
                 if 1 in self.lasts:
                     self.heads16 = Head(self.num_filters(16, self._stem_head_width[1])+self.ch_16, self._num_classes, True, norm_layer=BatchNorm2d)
                 else:
-                    self.heads16 = Head(self.num_filters(16, self._stem_head_width[1]), self._num_classes, True, norm_layer=BatchNorm2d)
+                    self.heads16 = Head(self.ch_16, self._num_classes, True, norm_layer=BatchNorm2d)
             else:
                 self.heads16 = Head(self.num_filters(16, self._stem_head_width[1]), self._num_classes, True, norm_layer=BatchNorm2d)
         self.heads8 = Head(self.num_filters(8, self._stem_head_width[1]) * self._branch, self._num_classes, Fch=self._Fch, scale=4, branch=self._branch, is_aux=False, norm_layer=BatchNorm2d)
@@ -239,7 +239,6 @@ class Network_Multi_Path_Infer(nn.Module):
             self.refines16 = ConvNorm(self.num_filters(8, self._stem_head_width[1])+self.ch_8_1, self.num_filters(8, self._stem_head_width[1]), 3, 1, 1, slimmable=False)
         self.ffm = FeatureFusion(self.num_filters(8, self._stem_head_width[1]) * self._branch, self.num_filters(8, self._stem_head_width[1]) * self._branch, reduction=1, Fch=self._Fch, scale=8, branch=self._branch, norm_layer=BatchNorm2d)
         self.avgpool = nn.AdaptiveAvgPool2d((4, 4))
-        self.fc = nn.Linear(self.num_filters(8, self._stem_head_width[1]) * self._branch * 16, 1000)
 
     def get_branch_groups_cells(self, ops, paths, downs, widths, lasts):
         num_branch = len(ops)
@@ -298,7 +297,7 @@ class Network_Multi_Path_Infer(nn.Module):
             groups_all.append(branch_groups)
         return groups_all, cells
     
-    def agg_ffm(self, outputs8, outputs16, outputs32, image_net=False):
+    def agg_ffm(self, outputs8, outputs16, outputs32):
         pred32 = []; pred16 = []; pred8 = [] # order of predictions is not important
         for branch in range(self._branch):
             last = self.lasts[branch]
@@ -328,16 +327,13 @@ class Network_Multi_Path_Infer(nn.Module):
             pred16 = self.heads16(torch.cat(pred16, dim=1))
         else:
             pred16 = None
-        if image_net:
-            pred8 = self.ffm(torch.cat(pred8, dim=1))
-        else:
-            pred8 = self.heads8(self.ffm(torch.cat(pred8, dim=1)))
+        pred8 = self.heads8(self.ffm(torch.cat(pred8, dim=1)))
         if self.training: 
             return pred8, pred16, pred32
         else:
             return pred8
 
-    def forward(self, input, image_net=False):
+    def forward(self, input):
         _, _, H, W = input.size()
         stem = self.stem(input)
 
@@ -358,27 +354,15 @@ class Network_Multi_Path_Infer(nn.Module):
                     elif scale == 32: outputs32[branch] = output
         
         if self.training:
-            pred8, pred16, pred32 = self.agg_ffm(outputs8, outputs16, outputs32, image_net)
-            if image_net:
-                x = self.avgpool(pred8)
-                x = torch.flatten(x, 1)
-                x = self.fc(x)
-                return x
-            else:
-                pred8 = F.interpolate(pred8, scale_factor=8, mode='bilinear', align_corners=True)
-                if pred16 is not None: pred16 = F.interpolate(pred16, scale_factor=16, mode='bilinear', align_corners=True)
-                if pred32 is not None: pred32 = F.interpolate(pred32, scale_factor=32, mode='bilinear', align_corners=True)
-                return pred8, pred16, pred32
+            pred8, pred16, pred32 = self.agg_ffm(outputs8, outputs16, outputs32)
+            pred8 = F.interpolate(pred8, scale_factor=8, mode='bilinear', align_corners=True)
+            if pred16 is not None: pred16 = F.interpolate(pred16, scale_factor=16, mode='bilinear', align_corners=True)
+            if pred32 is not None: pred32 = F.interpolate(pred32, scale_factor=32, mode='bilinear', align_corners=True)
+            return pred8, pred16, pred32
         else:
-            pred8 = self.agg_ffm(outputs8, outputs16, outputs32, image_net)
-            if image_net:
-                x = self.avgpool(pred8)
-                x = torch.flatten(x, 1)
-                x = self.fc(x)
-                return x
-            else:
-                out = F.interpolate(pred8, size=(int(pred8.size(2))*8, int(pred8.size(3))*8), mode='bilinear', align_corners=True)
-                return out
+            pred8 = self.agg_ffm(outputs8, outputs16, outputs32)
+            out = F.interpolate(pred8, size=(int(pred8.size(2))*8, int(pred8.size(3))*8), mode='bilinear', align_corners=True)
+            return out
     
     def forward_latency(self, size):
         _, H, W = size
