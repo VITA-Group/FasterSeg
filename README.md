@@ -1,9 +1,8 @@
 <!-- 
 TODO
 create a new virenv and test
-latency/seg_ops
-thop latest update
-Latency -->
+dataset_path in configs
+-->
 # FasterSeg: Searching for Faster Real-time Semantic Segmentation
 
 <!-- [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/chenwydj/ultra_high_resolution_segmentation.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/chenwydj/ultra_high_resolution_segmentation/context:python) -->
@@ -56,6 +55,7 @@ cd FasterSeg
 ```bash
 pip install requirements.txt
 ```
+* Install [PyCuda](https://wiki.tiker.net/PyCuda/Installation) which is a dependency of TensorRT.
 * Install [TensorRT](https://github.com/NVIDIA/TensorRT) (v5.1.5.0): a library for high performance inference on NVIDIA GPUs with [Python API](https://docs.nvidia.com/deeplearning/sdk/tensorrt-api/index.html#python).
 
 ## Usage
@@ -89,6 +89,7 @@ We start architecture searching for 30 epochs.
 CUDA_VISIBLE_DEVICES=0 python train_search.py
 ```
 * The searched architecture will be saved in a folder like ```FasterSeg/search/search-224x448_F12.L16_batch2-20200102-123456```.
+* `arch_0` and `arch_1` contains architectures for teacher and student networks, respectively.
 
 ### 2. Train from scratch
 * copy the folder which contains the searched architecture into `FasterSeg/train/` or create a symlink via `ln -s FasterSeg/search/search-224x448_F12.L16_batch2-20200102-123456 FasterSeg/train/search-224x448_F12.L16_batch2-20200102-123456`
@@ -106,6 +107,7 @@ CUDA_VISIBLE_DEVICES=0 python train.py
 <!-- * uncomment the `## train student with KL distillation from teacher ##` section in `config_train.py` and comment the `## train teacher model only ##` section. -->
 * set the name of your searched folder (see above) `C.load_path = "search-224x448_F12.L16_batch2-20200102-123456"` in `config_train.py`.
 * set the name of your teacher's folder (see above) `C.teacher_path = "train-512x1024_teacher_batch12-20200103-234501"` in `config_train.py`.
+* you can switch the evaluation of teacher or student by changing `C.mode` in `config_train.py`.
 * start the student's training process:
 ```bash
 CUDA_VISIBLE_DEVICES=0 python train.py
@@ -133,7 +135,13 @@ We support generating prediction files (masks as images) during training.
 * simple zip the prediction folder and submit to the [Cityscapes submission page](https://www.cityscapes-dataset.com/login/).
 
 ### 5. Latency Lookup Table
-To generate the latency lookup table:
+#### 5.1 Measure the latency of the FasterSeg
+* Run the script:
+```bash
+CUDA_VISIBLE_DEVICES=0 python run_latency.py
+```
+
+#### 5.2 Generate the latency lookup table:
 * `cd FasterSeg/latency`
 * Run the script:
 ```bash
