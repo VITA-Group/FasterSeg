@@ -226,9 +226,10 @@ class FeatureFusion(nn.Module):
     def forward(self, fm):
         # fm is already a concatenation of multiple scales
         fm = self.conv_1x1(fm)
-        fm_se = self.channel_attention(fm)
-        output = fm + fm * fm_se
-        return output
+        return fm
+        # fm_se = self.channel_attention(fm)
+        # output = fm + fm * fm_se
+        # return output
 
 
 class Head(nn.Module):

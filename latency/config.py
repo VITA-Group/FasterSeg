@@ -29,7 +29,7 @@ def add_path(path):
 
 add_path(osp.join(C.root_dir, 'tools'))
 
-
+C.num_classes = 19
 C.layers = 16
 """ Latency Config """
 C.mode = "student" # "teacher" or "student"
