@@ -23,7 +23,7 @@ C.this_dir = C.abs_dir.split(osp.sep)[-1]
 C.root_dir = C.abs_dir[:C.abs_dir.index(C.repo_name) + len(C.repo_name)]
 C.log_dir = osp.abspath(osp.join(C.root_dir, 'log', C.this_dir))
 
-"""Data Dir and Weight Dir"""
+"""Data Dir"""
 C.dataset_path = "/ssd1/chenwy/cityscapes/"
 C.img_root_folder = C.dataset_path
 C.gt_root_folder = C.dataset_path
