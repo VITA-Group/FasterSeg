@@ -243,7 +243,6 @@ class Network_Multi_Path_Infer(nn.Module):
             self.arms16 = ConvNorm(self.num_filters(16, self._stem_head_width[1]), self.num_filters(8, self._stem_head_width[1]), 1, 1, 0, slimmable=False)
             self.refines16 = ConvNorm(self.num_filters(8, self._stem_head_width[1])+self.ch_8_1, self.num_filters(8, self._stem_head_width[1]), 3, 1, 1, slimmable=False)
         self.ffm = FeatureFusion(self.num_filters(8, self._stem_head_width[1]) * self._branch, self.num_filters(8, self._stem_head_width[1]) * self._branch, reduction=1, Fch=self._Fch, scale=8, branch=self._branch, norm_layer=BatchNorm2d)
-        self.avgpool = nn.AdaptiveAvgPool2d((4, 4))
 
     def get_branch_groups_cells(self, ops, paths, downs, widths, lasts):
         num_branch = len(ops)
