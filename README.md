@@ -132,7 +132,7 @@ We support generating prediction files (masks as images) during training.
 * During the training process, the prediction files will be periodically saved in a folder like `train-512x1024_student_batch12-20200104-012345/test_1_#epoch`.
 * Simply zip the prediction folder and submit to the [Cityscapes submission page](https://www.cityscapes-dataset.com/login/).
 
-### 5. Latency Lookup Table
+### 5. Latency
 
 #### 5.0 Latency measurement tools
 * If you have successfully installed [TensorRT](https://github.com/chenwydj/FasterSeg#installation), you will automatically use TensorRT for the following latency tests (see [function](https://github.com/chenwydj/FasterSeg/blob/master/tools/utils/darts_utils.py#L167) here).
