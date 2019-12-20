@@ -1,4 +1,4 @@
-# FasterSeg: Searching for Faster Real-time Semantic Segmentation
+# FasterSeg: Searching for Faster Real-time Semantic Segmentation [[PDF](https://openreview.net/pdf?id=BJgqQ6NYvB)]
 
 <!-- [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/chenwydj/ultra_high_resolution_segmentation.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/chenwydj/ultra_high_resolution_segmentation/context:python) -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
@@ -90,7 +90,7 @@ CUDA_VISIBLE_DEVICES=0 python train_search.py
 
 ### 2. Train from scratch
 * `cd FasterSeg/train`
-* Copy the folder which contains the searched architecture into `FasterSeg/train/` or create a symlink via `ln -s FasterSeg/search/search-224x448_F12.L16_batch2-20200102-123456 FasterSeg/train/search-224x448_F12.L16_batch2-20200102-123456`
+* Copy the folder which contains the searched architecture into `FasterSeg/train/` or create a symlink via `ln -s ../search/search-224x448_F12.L16_batch2-20200102-123456 ./`
 #### 2.1 Train the teacher network
 * Set `C.mode = "teacher"` in `config_train.py`.
 <!-- * uncomment the `## train teacher model only ##` section in `config_train.py` and comment the `## train student with KL distillation from teacher ##` section. -->
