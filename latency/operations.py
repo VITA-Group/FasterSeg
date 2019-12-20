@@ -188,7 +188,6 @@ class BasicResidual1x(nn.Module):
         return latency, (c_out, h_out, w_out)
 
     def forward(self, x):
-        identity = x
         out = self.conv1(x)
         out = self.bn1(out)
         out = self.relu(out)
@@ -262,7 +261,6 @@ class BasicResidual_downup_1x(nn.Module):
         return latency, (c_out, h_out, w_out)
 
     def forward(self, x):
-        identity = x
         out = F.interpolate(x, size=(int(x.size(2))//2, int(x.size(3))//2), mode='nearest')
         out = self.conv1(out)
         out = self.bn1(out)
@@ -343,7 +341,6 @@ class BasicResidual2x(nn.Module):
         return latency, (c_out, h_out, w_out)
 
     def forward(self, x):
-        identity = x
         out = self.conv1(x)
         out = self.bn1(out)
         out = self.relu(out)
@@ -426,7 +423,6 @@ class BasicResidual_downup_2x(nn.Module):
         return latency, (c_out, h_out, w_out)
 
     def forward(self, x):
-        identity = x
         out = F.interpolate(x, size=(int(x.size(2))//2, int(x.size(3))//2), mode='nearest')
         out = self.conv1(out)
         out = self.bn1(out)

@@ -6,7 +6,6 @@ from __future__ import print_function
 
 import os.path as osp
 import sys
-import time
 import numpy as np
 from easydict import EasyDict as edict
 

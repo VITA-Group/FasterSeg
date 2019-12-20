@@ -6,8 +6,6 @@ import glob
 import logging
 
 import torch
-import torch.nn as nn
-import torch.backends.cudnn as cudnn
 
 import numpy as np
 from thop import profile
@@ -15,7 +13,7 @@ from thop import profile
 from config import config
 config.save = 'latency-{}-{}'.format(config.save, time.strftime("%Y%m%d-%H%M%S"))
 
-from utils.darts_utils import create_exp_dir, save, plot_op, plot_path_width, objective_acc_lat
+from utils.darts_utils import create_exp_dir, plot_op, plot_path_width, objective_acc_lat
 try:
     from utils.darts_utils import compute_latency_ms_tensorrt as compute_latency
     print("use TensorRT for latency test")
@@ -46,7 +44,6 @@ def main():
         torch.cuda.manual_seed(seed)
 
     # Model #######################################
-    models = []
     lasts = []
     for idx, arch_idx in enumerate(config.arch_idx):
         if config.load_epoch == "last":
