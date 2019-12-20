@@ -222,8 +222,6 @@ def train(pretrain, train_loader_model, train_loader_arch, model, architect, cri
     dataloader_arch = iter(train_loader_arch)
 
     for step in pbar:
-        lr = optimizer.param_groups[0]['lr']
-
         optimizer.zero_grad()
 
         minibatch = dataloader_model.next()
@@ -255,7 +253,7 @@ def train(pretrain, train_loader_model, train_loader_arch, model, architect, cri
         pbar.set_description("[Step %d/%d]" % (step + 1, len(train_loader_model)))
     torch.cuda.empty_cache()
     del loss
-    if update_arch: del loss_arch
+    # if update_arch: del loss_arch
 
 
 def infer(epoch, model, evaluator, logger, FPS=True):

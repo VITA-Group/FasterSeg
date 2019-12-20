@@ -159,8 +159,6 @@ def center_crop(img, shape):
 def random_crop(img, gt, size):
     if isinstance(size, numbers.Number):
         size = (int(size), int(size))
-    else:
-        size = size
 
     h, w = img.shape[:2]
     crop_h, crop_w = size[0], size[1]

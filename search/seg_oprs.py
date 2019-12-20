@@ -242,7 +242,7 @@ class Head(nn.Module):
                 mid_planes = in_planes
             else:
                 mid_planes = in_planes
-        elif in_planes >= 256:
+        elif in_planes > 256:
             if is_aux:
                 mid_planes = in_planes // 2
             else:

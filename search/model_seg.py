@@ -99,7 +99,6 @@ def alphas2ops_path_width(alphas, path, widths):
     return ops, path_compact, widths_compact
 
 def betas2path(betas, last, layers):
-    path = [last]
     downs = [0] * layers
     # betas1 is of length layers-2; beta2: layers-3; beta3: layers-4
     if last == 1:
