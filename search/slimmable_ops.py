@@ -64,8 +64,6 @@ class USBatchNorm2d(nn.BatchNorm2d):
         self.ratio = ratio
 
     def forward(self, input):
-        weight = self.weight
-        bias = self.bias
         assert self.ratio in self.width_mult_list
         idx = self.width_mult_list.index(self.ratio)
         y = self.bn[idx](input)

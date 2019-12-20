@@ -1,12 +1,10 @@
 # encoding: utf-8
 import os
-import sys
 import time
 import argparse
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 
 import torch
-import torch.utils.model_zoo as model_zoo
 import torch.distributed as dist
 
 from engine.logger import get_logger

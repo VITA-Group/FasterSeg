@@ -3,7 +3,6 @@ import math
 import numpy as np
 import torch
 import shutil
-import torchvision.transforms as transforms
 from torch.autograd import Variable
 import time
 from tqdm import tqdm
@@ -97,7 +96,6 @@ def create_exp_dir(path, scripts_to_save=None):
 ########################## TensorRT speed_test #################################
 try:
     import tensorrt as trt
-    from PIL import Image
     import pycuda.driver as cuda
     import pycuda.autoinit
 
@@ -254,7 +252,6 @@ def plot_path(lasts, paths=[]):
     plt.legend(prop={'size': 14}, loc=3)
     return f
 
-from matplotlib.patches import Rectangle
 
 def plot_path_width(lasts, paths=[], widths=[]):
     '''

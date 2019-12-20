@@ -1,13 +1,9 @@
 import torch
 import numpy as np
-import torch.nn as nn
-from torch.nn import functional as F
+from torch import nn
 from torch.autograd import Variable
-import numpy as np
 from pdb import set_trace as bp
-from thop import profile
 from operations import *
-from genotypes import PRIMITIVES
 
 
 def _concat(xs):

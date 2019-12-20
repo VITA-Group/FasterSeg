@@ -3,18 +3,12 @@
 import os
 import cv2
 cv2.setNumThreads(0)
-import argparse
 import numpy as np
 
-import torch
-import torch.multiprocessing as mp
-
-from utils.pyt_utils import ensure_dir, link_file, load_model, parse_devices
 from utils.visualize import print_iou, show_img
 from engine.evaluator import Evaluator
 from engine.logger import get_logger
 from seg_opr.metric import hist_info, compute_score
-from datasets.cityscapes import Cityscapes
 
 logger = get_logger()
 

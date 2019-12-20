@@ -10,7 +10,6 @@ import torch
 import torch.nn as nn
 import torch.utils
 import torch.nn.functional as F
-import torch.backends.cudnn as cudnn
 from tensorboardX import SummaryWriter
 
 import numpy as np
@@ -85,7 +84,6 @@ def main():
 
     # Model #######################################
     models = []
-    optimizers = []
     evaluators = []
     testers = []
     lasts = []
@@ -228,7 +226,6 @@ def train(train_loader, models, criterion, distill_criterion, optimizer, logger,
     metrics = [ seg_metrics.Seg_Metrics(n_classes=config.num_classes) for _ in range(len(models)) ]
     lamb = 0.2
     for step in pbar:
-        current_idx = epoch * config.niters_per_epoch + step
         optimizer.zero_grad()
 
         minibatch = dataloader.next()

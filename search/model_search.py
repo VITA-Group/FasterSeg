@@ -8,8 +8,6 @@ from genotypes import PRIMITIVES
 from pdb import set_trace as bp
 from seg_oprs import Head
 import numpy as np
-from thop import profile
-from matplotlib import pyplot as plt
 
 
 # https://github.com/YongfeiYan/Gumbel_Softmax_VAE/blob/master/gumbel_softmax_vae.py
@@ -364,13 +362,6 @@ class Network_Multi_Path(nn.Module):
         # out_prev: cell-state
         # index 0: keep; index 1: down
         stem = self.stem[self.arch_idx]
-        refine16 = self.refine16[self.arch_idx]
-        refine32 = self.refine32[self.arch_idx]
-        head0 = self.head0[self.arch_idx]
-        head1 = self.head1[self.arch_idx]
-        head2 = self.head2[self.arch_idx]
-        head02 = self.head02[self.arch_idx]
-        head12 = self.head12[self.arch_idx]
 
         if alpha:
             alphas0 = F.softmax(getattr(self, self._arch_names[self.arch_idx]["alphas"][0]), dim=-1)
@@ -477,9 +468,9 @@ class Network_Multi_Path(nn.Module):
                         if lat[0] is not None: latency_total[ii][0] = betas[j][i-j-1][1] * latency_total[ii][0] + betas[j][i-j-1][0] * latency_total[ii-1][1] + lat[0]
                         if lat[1] is not None: latency_total[ii][1] = betas[j][i-j-1][1] * latency_total[ii][0] + betas[j][i-j-1][0] * latency_total[ii-1][1] + lat[1]
         ###################################
-        size0 = out[0][0]; latency0 = latency_total[0][0]
-        size1 = out[1][0]; latency1 = latency_total[1][0]
-        size2 = out[2][0]; latency2 = latency_total[2][0]
+        latency0 = latency_total[0][0]
+        latency1 = latency_total[1][0]
+        latency2 = latency_total[2][0]
         latency = sum(lat * w for lat, w in zip([latency0, latency1, latency2], scale_latency_weights))
         return latency
         ###################################

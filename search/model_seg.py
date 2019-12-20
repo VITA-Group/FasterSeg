@@ -1,15 +1,10 @@
-import os
-import sys
-from torch.nn.functional import interpolate
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import numpy as np
+from torch.nn import functional as F
 from operations import *
 from genotypes import PRIMITIVES
 from pdb import set_trace as bp
-from tqdm import tqdm
 from seg_oprs import FeatureFusion, Head
 
 BatchNorm2d = nn.BatchNorm2d

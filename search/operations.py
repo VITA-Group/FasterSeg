@@ -193,7 +193,6 @@ class BasicResidual1x(nn.Module):
         return latency, (c_out, h_out, w_out)
 
     def forward(self, x):
-        identity = x
         out = self.conv1(x)
         out = self.bn1(out)
         out = self.relu(out)
@@ -268,14 +267,11 @@ class BasicResidual_downup_1x(nn.Module):
         return latency, (c_out, h_out, w_out)
 
     def forward(self, x):
-        identity = x
         out = F.interpolate(x, size=(int(x.size(2))//2, int(x.size(3))//2), mode='bilinear', align_corners=True)
-        # out = F.interpolate(x, size=(int(x.size(2))//2, int(x.size(3))//2), mode='nearest')
         out = self.conv1(out)
         out = self.bn1(out)
         if self.stride == 1:
             out = F.interpolate(out, size=(int(x.size(2)), int(x.size(3))), mode='bilinear', align_corners=True)
-            # out = F.interpolate(out, size=(int(x.size(2)), int(x.size(3))), mode='nearest')
         out = self.relu(out)
         return out
 
@@ -353,7 +349,6 @@ class BasicResidual2x(nn.Module):
         return latency, (c_out, h_out, w_out)
 
     def forward(self, x):
-        identity = x
         out = self.conv1(x)
         out = self.bn1(out)
         out = self.relu(out)
@@ -438,9 +433,7 @@ class BasicResidual_downup_2x(nn.Module):
         return latency, (c_out, h_out, w_out)
 
     def forward(self, x):
-        identity = x
         out = F.interpolate(x, size=(int(x.size(2))//2, int(x.size(3))//2), mode='bilinear', align_corners=True)
-        # out = F.interpolate(x, size=(int(x.size(2))//2, int(x.size(3))//2), mode='nearest')
         out = self.conv1(out)
         out = self.bn1(out)
         out = self.relu(out)
@@ -448,7 +441,6 @@ class BasicResidual_downup_2x(nn.Module):
         out = self.bn2(out)
         if self.stride == 1:
             out = F.interpolate(out, size=(int(x.size(2)), int(x.size(3))), mode='bilinear', align_corners=True)
-            # out = F.interpolate(out, size=(int(x.size(2)), int(x.size(3))), mode='nearest')
         out = self.relu(out)
         return out
 
@@ -527,8 +519,6 @@ class FactorizedReduce(nn.Module):
 
     def forward(self, x):
         if self.stride == 2:
-            # TensorRT: [Slice]: slice is out of input range
-            # out = self.conv1(x)
             out = torch.cat([self.conv1(x), self.conv2(x[:,:,1:,1:])], dim=1)
             out = self.bn(out)
             out = self.relu(out)

@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# encoding: utf-8
-# @Time    : 2018/6/17 上午12:43
-# @Author  : yuchangqian
-# @Contact : changqian_yu@163.com
-# @File    : seg_oprs.py
-from collections import OrderedDict
 import numpy as np
 try:
     from utils.darts_utils import compute_latency_ms_tensorrt as compute_latency

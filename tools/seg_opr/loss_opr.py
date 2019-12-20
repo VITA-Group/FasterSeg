@@ -1,6 +1,3 @@
-import numpy as np
-import scipy.ndimage as nd
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

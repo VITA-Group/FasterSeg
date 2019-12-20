@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-# encoding: utf-8
-# @Time    : 2017/12/16 下午8:41
-# @Author  : yuchangqian
-# @Contact : changqian_yu@163.com
-# @File    : cityscapes.py
 import numpy as np
 
 from datasets.BaseDataset import BaseDataset

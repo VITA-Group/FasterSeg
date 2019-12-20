@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-# encoding: utf-8
-# @Time    : 2018/9/28 下午12:13
-# @Author  : yuchangqian
-# @Contact : changqian_yu@163.com
-# @File    : init_func.py.py
 import torch
 import torch.nn as nn
 

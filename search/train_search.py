@@ -9,8 +9,6 @@ from tqdm import tqdm
 import torch
 import torch.nn as nn
 import torch.utils
-import torch.nn.functional as F
-import torch.backends.cudnn as cudnn
 from tensorboardX import SummaryWriter
 
 import numpy as np
@@ -32,7 +30,6 @@ from architect import Architect
 from utils.darts_utils import create_exp_dir, save, plot_op, plot_path_width, objective_acc_lat
 from model_search import Network_Multi_Path as Network
 from model_seg import Network_Multi_Path_Infer
-import seg_metrics
 
 
 def main(pretrain=True):
@@ -100,7 +97,6 @@ def main(pretrain=True):
         weight_decay=config.weight_decay)
 
     # lr policy ##############################
-    total_iteration = config.nepochs * config.niters_per_epoch
     lr_policy = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.978)
 
     # data loader ###########################

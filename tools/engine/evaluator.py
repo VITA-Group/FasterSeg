@@ -1,12 +1,10 @@
 import os
-import os.path as osp
 import cv2
 import numpy as np
 import time
 from tqdm import tqdm
 
 import torch
-import torch.nn.functional as F
 import torch.multiprocessing as mp
 
 from engine.logger import get_logger
@@ -190,7 +188,7 @@ class Evaluator(object):
         return result_line, mIoU
 
     def worker(self, shred_list, device):
-        start_load_time = time.time()
+        # start_load_time = time.time()
         # logger.info('Load Model on Device %d: %.2fs' % (device, time.time() - start_load_time))
         for idx in shred_list:
             dd = self.dataset[idx]
