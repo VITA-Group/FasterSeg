@@ -1,14 +1,10 @@
 # FasterSeg: Searching for Faster Real-time Semantic Segmentation [[PDF](https://openreview.net/pdf?id=BJgqQ6NYvB)]
 
-<!-- [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/chenwydj/ultra_high_resolution_segmentation.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/chenwydj/ultra_high_resolution_segmentation/context:python) -->
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-
-<!-- <a href="https://arxiv.org/abs/1905.06368">Collaborative Global-Local Networks for Memory-Efﬁcient Segmentation of Ultra-High Resolution Images</a> -->
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/TAMU-VITA/FasterSeg.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/TAMU-VITA/FasterSeg/context:python) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
 Wuyang Chen, Xinyu Gong, Xianming Liu, Qian Zhang, Yuan Li, Zhangyang Wang
 
 In ICLR 2020.
-<!-- [[Youtube](https://www.youtube.com/watch?v=am1GiItQI88)] -->
 
 ## Overview
 
