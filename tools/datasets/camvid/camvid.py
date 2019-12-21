@@ -1,5 +1,3 @@
-import numpy as np
-
 from datasets.BaseDataset import BaseDataset
 
 
