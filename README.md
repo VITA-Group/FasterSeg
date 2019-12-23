@@ -36,7 +36,7 @@ Highlights:
 - Python 3
 - NVIDIA GPU + CUDA CuDNN
 
-This repository has been tested on GTX 1808Ti. Configurations (e.g batch size, image patch size) may need to be changed on different platforms.
+This repository has been tested on GTX 1080Ti. Configurations (e.g batch size, image patch size) may need to be changed on different platforms.
 
 ## Installation
 * Clone this repo:
