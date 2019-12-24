@@ -15,7 +15,7 @@ Highlights:
 * **Fine-grained latency regularization**: alleviate the "architecture collapse" problem.
 * **Teacher-student co-searching**: distill the teacher to the student for further accuracy boost.
 * **SOTA**: FasterSeg achieves extremely fast speed (over 30\% faster than the closest manually designed competitor on CityScapes) and maintains competitive accuracy.
-    - see our Cityscapes submission [here](https://www.cityscapes-dataset.com/edit-submission/?submissionID=5674).
+    - see our Cityscapes submission [here](https://www.cityscapes-dataset.com/method-details/?submissionID=5674).
 
 <p align="center">
 <img src="images/table4.png" alt="Cityscapes" width="550"/></br>
