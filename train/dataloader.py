@@ -49,7 +49,6 @@ def get_train_loader(config, dataset, portion=None, worker=None, test=False):
 
     train_dataset = dataset(data_setting, "train", train_preprocess, config.batch_size * config.niters_per_epoch)
 
-    train_sampler = None
     is_shuffle = True
     batch_size = config.batch_size
 
@@ -58,7 +57,6 @@ def get_train_loader(config, dataset, portion=None, worker=None, test=False):
                                    num_workers=config.num_workers if worker is None else worker,
                                    drop_last=True,
                                    shuffle=is_shuffle,
-                                   pin_memory=True,
-                                   sampler=train_sampler)
+                                   pin_memory=True)
 
-    return train_loader, train_sampler
+    return train_loader

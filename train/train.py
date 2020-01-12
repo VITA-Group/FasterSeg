@@ -79,7 +79,7 @@ def main():
                         'test_source': config.test_source,
                         'down_sampling': config.down_sampling}
 
-    train_loader, train_sampler = get_train_loader(config, Cityscapes, test=config.is_test)
+    train_loader = get_train_loader(config, Cityscapes, test=config.is_test)
 
 
     # Model #######################################
