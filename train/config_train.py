@@ -65,7 +65,7 @@ C.train_scale_array = [0.75, 1, 1.25]
 """Eval Config"""
 C.eval_stride_rate = 5 / 6
 C.eval_scale_array = [1, ]
-C.eval_flip = True
+C.eval_flip = False
 C.eval_base_size = 1024
 C.eval_crop_size = 1024
 C.eval_height = 1024
