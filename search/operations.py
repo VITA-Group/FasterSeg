@@ -90,7 +90,7 @@ class ConvNorm(nn.Module):
     @staticmethod
     def _flops(h, w, C_in, C_out, kernel_size=3, stride=1, padding=None, dilation=1, groups=1, bias=False):
         layer = ConvNorm(C_in, C_out, kernel_size, stride, padding, dilation, groups, bias, slimmable=False)
-        flops, params = profile(layer, inputs=(torch.randn(1, C_in, h, w),))
+        flops, params = profile(layer, inputs=(torch.randn(1, C_in, h, w),), verbose=False)
         return flops
     
     @staticmethod
@@ -161,7 +161,7 @@ class BasicResidual1x(nn.Module):
     @staticmethod
     def _flops(h, w, C_in, C_out, kernel_size=3, stride=1, dilation=1, groups=1):
         layer = BasicResidual1x(C_in, C_out, kernel_size, stride, dilation, groups, slimmable=False)
-        flops, params = profile(layer, inputs=(torch.randn(1, C_in, h, w),))
+        flops, params = profile(layer, inputs=(torch.randn(1, C_in, h, w),), verbose=False)
         return flops
     
     @staticmethod
@@ -234,7 +234,7 @@ class BasicResidual_downup_1x(nn.Module):
     def _flops(h, w, C_in, C_out, kernel_size=3, stride=1, dilation=1, groups=1):
         assert stride in [1, 2]
         layer = BasicResidual_downup_1x(C_in, C_out, kernel_size, stride, dilation, groups, slimmable=False)
-        flops, params = profile(layer, inputs=(torch.randn(1, C_in, h, w),))
+        flops, params = profile(layer, inputs=(torch.randn(1, C_in, h, w),), verbose=False)
         return flops
     
     @staticmethod
@@ -317,7 +317,7 @@ class BasicResidual2x(nn.Module):
     @staticmethod
     def _flops(h, w, C_in, C_out, kernel_size=3, stride=1, dilation=1, groups=1):
         layer = BasicResidual2x(C_in, C_out, kernel_size, stride, dilation, groups, slimmable=False)
-        flops, params = profile(layer, inputs=(torch.randn(1, C_in, h, w),))
+        flops, params = profile(layer, inputs=(torch.randn(1, C_in, h, w),), verbose=False)
         return flops
     
     @staticmethod
@@ -400,7 +400,7 @@ class BasicResidual_downup_2x(nn.Module):
     def _flops(h, w, C_in, C_out, kernel_size=3, stride=1, dilation=1, groups=1):
         assert stride in [1, 2]
         layer = BasicResidual_downup_2x(C_in, C_out, kernel_size, stride, dilation, groups, slimmable=False)
-        flops, params = profile(layer, inputs=(torch.randn(1, C_in, h, w),))
+        flops, params = profile(layer, inputs=(torch.randn(1, C_in, h, w),), verbose=False)
         return flops
     
     @staticmethod
@@ -486,7 +486,7 @@ class FactorizedReduce(nn.Module):
     @staticmethod
     def _flops(h, w, C_in, C_out, stride=1):
         layer = FactorizedReduce(C_in, C_out, stride, slimmable=False)
-        flops, params = profile(layer, inputs=(torch.randn(1, C_in, h, w),))
+        flops, params = profile(layer, inputs=(torch.randn(1, C_in, h, w),), verbose=False)
         return flops
 
     @staticmethod

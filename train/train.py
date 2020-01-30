@@ -113,7 +113,7 @@ def main():
                 plot_op(getattr(model, "ops%d"%b), getattr(model, "path%d"%b), F_base=config.Fch).savefig(os.path.join(config.save, "ops_%d_%d.png"%(arch_idx,b)), bbox_inches="tight")
         plot_path_width(model.lasts, model.paths, model.widths).savefig(os.path.join(config.save, "path_width%d.png"%arch_idx))
         plot_path_width([2, 1, 0], [model.path2, model.path1, model.path0], [model.widths2, model.widths1, model.widths0]).savefig(os.path.join(config.save, "path_width_all%d.png"%arch_idx))
-        flops, params = profile(model, inputs=(torch.randn(1, 3, 1024, 2048),))
+        flops, params = profile(model, inputs=(torch.randn(1, 3, 1024, 2048),), verbose=False)
         logging.info("params = %fMB, FLOPs = %fGB", params / 1e6, flops / 1e9)
         logging.info("ops:" + str(model.ops))
         logging.info("path:" + str(model.paths))

@@ -63,7 +63,7 @@ def main(pretrain=True):
 
     # Model #######################################
     model = Network(config.num_classes, config.layers, ohem_criterion, Fch=config.Fch, width_mult_list=config.width_mult_list, prun_modes=config.prun_modes, stem_head_width=config.stem_head_width)
-    flops, params = profile(model, inputs=(torch.randn(1, 3, 1024, 2048),))
+    flops, params = profile(model, inputs=(torch.randn(1, 3, 1024, 2048),), verbose=False)
     logging.info("params = %fMB, FLOPs = %fGB", params / 1e6, flops / 1e9)
     model = model.cuda()
     if type(pretrain) == str:
