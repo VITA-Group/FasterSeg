@@ -136,11 +136,11 @@ def main():
 
         evaluator = SegEvaluator(Cityscapes(data_setting, 'val', None), config.num_classes, config.image_mean,
                                  config.image_std, model, config.eval_scale_array, config.eval_flip, 0, out_idx=0, config=config,
-                                 verbose=False, save_path=None, show_image=False)
+                                 verbose=False, save_path=None, show_image=False, show_prediction=False)
         evaluators.append(evaluator)
         tester = SegTester(Cityscapes(data_setting, 'test', None), config.num_classes, config.image_mean,
                                  config.image_std, model, config.eval_scale_array, config.eval_flip, 0, out_idx=0, config=config,
-                                 verbose=False, save_path=None, show_image=False)
+                                 verbose=False, save_path=None, show_prediction=False)
         testers.append(tester)
 
         # Optimizer ###################################
@@ -156,17 +156,23 @@ def main():
         logging.info(config.load_path)
         logging.info(config.eval_path)
         logging.info(config.save)
-        # validation
-        print("[validation...]")
         with torch.no_grad():
-            valid_mIoUs = infer(models, evaluators, logger)
-            for idx, arch_idx in enumerate(config.arch_idx):
-                if arch_idx == 0:
-                    logger.add_scalar("mIoU/val_teacher", valid_mIoUs[idx], 0)
-                    logging.info("teacher's valid_mIoU %.3f"%(valid_mIoUs[idx]))
-                else:
-                    logger.add_scalar("mIoU/val_student", valid_mIoUs[idx], 0)
-                    logging.info("student's valid_mIoU %.3f"%(valid_mIoUs[idx]))
+            if config.is_test:
+                # test
+                print("[test...]")
+                with torch.no_grad():
+                    test(0, models, testers, logger)
+            else:
+                # validation
+                print("[validation...]")
+                valid_mIoUs = infer(models, evaluators, logger)
+                for idx, arch_idx in enumerate(config.arch_idx):
+                    if arch_idx == 0:
+                        logger.add_scalar("mIoU/val_teacher", valid_mIoUs[idx], 0)
+                        logging.info("teacher's valid_mIoU %.3f"%(valid_mIoUs[idx]))
+                    else:
+                        logger.add_scalar("mIoU/val_student", valid_mIoUs[idx], 0)
+                        logging.info("student's valid_mIoU %.3f"%(valid_mIoUs[idx]))
         exit(0)
 
     tbar = tqdm(range(config.nepochs), ncols=80)
@@ -276,9 +282,9 @@ def infer(models, evaluators, logger):
 
 def test(epoch, models, testers, logger):
     for idx, arch_idx in enumerate(config.arch_idx):
+        if arch_idx == 0: continue
         model = models[idx]
         tester = testers[idx]
-        if arch_idx == 0: continue
         os.system("mkdir %s"%os.path.join(os.path.join(os.path.realpath('.'), config.save, "test")))
         model.eval()
         tester.run_online()

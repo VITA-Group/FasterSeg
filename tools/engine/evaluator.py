@@ -17,7 +17,7 @@ logger = get_logger()
 class Evaluator(object):
     def __init__(self, dataset, class_num, image_mean, image_std, network,
                  multi_scales, is_flip, devices=0, out_idx=0, threds=3, config=None, logger=None,
-                 verbose=False, save_path=None, show_image=False):
+                 verbose=False, save_path=None, show_image=False, show_prediction=False):
         self.dataset = dataset
         self.ndata = self.dataset.get_length()
         self.class_num = class_num
@@ -42,6 +42,7 @@ class Evaluator(object):
         if save_path is not None:
             ensure_dir(save_path)
         self.show_image = show_image
+        self.show_prediction = show_prediction
 
     def run(self, model_path, model_indice, log_file, log_file_link):
         """There are four evaluation modes:

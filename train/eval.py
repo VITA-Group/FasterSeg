@@ -5,7 +5,7 @@ import cv2
 cv2.setNumThreads(0)
 import numpy as np
 
-from utils.visualize import print_iou, show_img
+from utils.visualize import print_iou, show_img, show_prediction
 from engine.evaluator import Evaluator
 from engine.logger import get_logger
 from seg_opr.metric import hist_info, compute_score
@@ -40,11 +40,14 @@ class SegEvaluator(Evaluator):
             comp_img = show_img(colors, config.background, image, clean, label, pred)
             self.logger.add_image('vis', np.swapaxes(np.swapaxes(comp_img, 0, 2), 1, 2), iter)
 
-        if self.show_image:
+        if self.show_image or self.show_prediction:
             colors = self.dataset.get_class_colors()
             image = img
             clean = np.zeros(label.shape)
-            comp_img = show_img(colors, config.background, image, clean, label, pred)
+            if self.show_image:
+                comp_img = show_img(colors, config.background, image, clean, label, pred)
+            else:
+                comp_img = show_prediction(colors, config.background, image, pred)
             cv2.imwrite(name + ".png", comp_img[:,:,::-1])
 
         return results_dict

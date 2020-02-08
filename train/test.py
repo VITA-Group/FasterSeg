@@ -13,7 +13,7 @@ import torch
 import torch.multiprocessing as mp
 
 from utils.pyt_utils import ensure_dir, link_file, load_model, parse_devices
-from utils.visualize import print_iou, show_img
+from utils.visualize import print_iou, show_prediction
 from engine.tester import Tester
 from engine.logger import get_logger
 from seg_opr.metric import hist_info, compute_score
@@ -56,6 +56,13 @@ class SegTester(Tester):
             pred = self.whole_eval(img, None, device)
         else:
             pred = self.sliding_eval(img, config.eval_crop_size, config.eval_stride_rate, device)
+
+        if self.show_prediction:
+            colors = self.dataset.get_class_colors()
+            image = img
+            comp_img = show_prediction(colors, config.background, image, pred)
+            cv2.imwrite(os.path.join(os.path.realpath('.'), self.config.save, "test", name+".viz.png"), comp_img[:,:,::-1])
+
         for x in range(pred.shape[0]):
             for y in range(pred.shape[1]):
                 pred[x, y] = cityscapes_trainID2id[pred[x, y]]

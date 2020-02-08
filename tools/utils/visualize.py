@@ -3,20 +3,20 @@ import cv2
 import scipy.io as sio
 
 
-def set_img_color(colors, background, img, gt, show255=False):
+def set_img_color(colors, background, img, gt, show255=False, weight_foreground=0.55):
     origin = np.array(img)
     for i in range(len(colors)):
         if i != background:
             img[np.where(gt == i)] = colors[i]
     if show255:
         img[np.where(gt == 255)] = 0
-    cv2.addWeighted(img, 0.55, origin, 0.45, 0, img)
+    cv2.addWeighted(img, weight_foreground, origin, (1 - weight_foreground), 0, img)
     return img
 
 
-def show_prediction(colors, background, img, pred):
+def show_prediction(colors, background, img, pred, weight_foreground=1):
     im = np.array(img, np.uint8)
-    set_img_color(colors, background, im, pred)
+    set_img_color(colors, background, im, pred, weight_foreground=weight_foreground)
     final = np.array(im)
     return final
 
