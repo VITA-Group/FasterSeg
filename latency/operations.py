@@ -1,3 +1,5 @@
+__all__ = ['ConvNorm', 'BasicResidual1x', 'BasicResidual_downup_1x', 'BasicResidual2x', 'BasicResidual_downup_2x', 'FactorizedReduce', 'OPS', 'OPS_name', 'OPS_Class']
+
 from pdb import set_trace as bp
 import torch
 import torch.nn as nn
@@ -27,7 +29,6 @@ except:
     print("use PyTorch for latency test")
 from slimmable_ops import USConv2d, USBatchNorm2d
 
-__all__ = ['ConvNorm', 'BasicResidual1x', 'BasicResidual_downup_1x', 'BasicResidual2x', 'BasicResidual_downup_2x', 'FactorizedReduce', 'OPS', 'OPS_name', 'OPS_Class']
 
 latency_lookup_table = {}
 table_file_name = "latency_lookup_table.npy"

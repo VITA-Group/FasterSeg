@@ -19,7 +19,7 @@ def compute_score(hist, correct, labeled):
     iu = np.diag(hist) / (hist.sum(1) + hist.sum(0) - np.diag(hist))
     mean_IU = np.nanmean(iu)
     mean_IU_no_back = np.nanmean(iu[1:])
-    freq = hist.sum(1) / hist.sum()
+    # freq = hist.sum(1) / hist.sum()
     # freq_IU = (iu[freq > 0] * freq[freq > 0]).sum()
     mean_pixel_acc = correct / labeled
 

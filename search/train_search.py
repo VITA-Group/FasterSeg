@@ -248,7 +248,7 @@ def train(pretrain, train_loader_model, train_loader_arch, model, architect, cri
 
         pbar.set_description("[Step %d/%d]" % (step + 1, len(train_loader_model)))
     torch.cuda.empty_cache()
-    del loss
+    # del loss
     # if update_arch: del loss_arch
 
 

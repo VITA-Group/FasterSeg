@@ -97,7 +97,7 @@ def create_exp_dir(path, scripts_to_save=None):
 try:
     import tensorrt as trt
     import pycuda.driver as cuda
-    import pycuda.autoinit
+    # import pycuda.autoinit
 
     MAX_BATCH_SIZE = 1
     MAX_WORKSPACE_SIZE = 1 << 30
