@@ -8,10 +8,10 @@ In ICLR 2020.
 
 ## Overview
 
-<figure align="center">
+<p align="center">
   <img src="images/cityscapes_128x256.gif" alt="Cityscapes" width="300"/></br>
-  <figcaption>Our predictions on Cityscapes Stuttgart demo video #0</figcaption>
-</figure>
+  <span align="center">Our predictions on Cityscapes Stuttgart demo video #0</span>
+</p>
 
 We present FasterSeg, an automatically designed semantic segmentation network with not only state-of-the-art performance but also faster speed than current methods. 
 
