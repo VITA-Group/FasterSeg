@@ -38,8 +38,9 @@ Highlights:
 
 ## Prerequisites
 - Ubuntu
-- Python 3
-- NVIDIA GPU + CUDA CuDNN
+- Python 3.6.8
+- CUDA 10.1 (lower versions may work but were not tested)
+- NVIDIA GPU (>= 11G graphic memory) + CuDNN v7.3
 
 This repository has been tested on GTX 1080Ti. Configurations (e.g batch size, image patch size) may need to be changed on different platforms.
 
