@@ -37,7 +37,7 @@ Highlights:
 </p>
 
 ## Prerequisites
-- Ubuntu
+- Ubuntu 16.04
 - Python 3.6.8
 - CUDA 10.1 (lower versions may work but were not tested)
 - NVIDIA GPU (>= 11G graphic memory) + CuDNN v7.3
