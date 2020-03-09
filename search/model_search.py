@@ -358,7 +358,7 @@ class Network_Multi_Path(nn.Module):
         return pred0, pred1, pred2, pred02, pred12
         ###################################
     
-    def forward_latency(self, size, alpha=True, beta=True, ratio=True, scale_latency_weights=[3./12, 4./12, 5./12]):
+    def forward_latency(self, size, alpha=True, beta=True, ratio=True):
         # out_prev: cell-state
         # index 0: keep; index 1: down
         stem = self.stem[self.arch_idx]
@@ -471,7 +471,7 @@ class Network_Multi_Path(nn.Module):
         latency0 = latency_total[0][0]
         latency1 = latency_total[1][0]
         latency2 = latency_total[2][0]
-        latency = sum(lat * w for lat, w in zip([latency0, latency1, latency2], scale_latency_weights))
+        latency = sum([latency0, latency1, latency2])
         return latency
         ###################################
 
