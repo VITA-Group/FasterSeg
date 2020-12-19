@@ -15,6 +15,7 @@ class BaseDataset(data.Dataset):
         self._img_path = setting['img_root']
         self._gt_path = setting['gt_root']
         self._portion = setting['portion'] if 'portion' in setting else None
+        self._index_select = setting['index_select'] if 'index_select' in setting else None
         self._train_source = setting['train_source']
         self._eval_source = setting['eval_source']
         self._test_source = setting['test_source'] if 'test_source' in setting else setting['eval_source']
@@ -79,6 +80,9 @@ class BaseDataset(data.Dataset):
         file_names = []
         with open(source) as f:
             files = f.readlines()
+        if self._index_select is not None:
+            assert len(self._index_select) == len(files), "%d v.s. %d"%(self._index_select, len(files))
+            files = np.take(files, self._index_select).tolist()
         if self._portion is not None:
             num_files = len(files)
             if self._portion > 0:

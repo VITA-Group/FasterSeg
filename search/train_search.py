@@ -5,6 +5,7 @@ import time
 import glob
 import logging
 from tqdm import tqdm
+from random import shuffle
 
 import torch
 import torch.nn as nn
@@ -105,8 +106,10 @@ def main(pretrain=True):
                     'train_source': config.train_source,
                     'eval_source': config.eval_source,
                     'down_sampling': config.down_sampling}
-    train_loader_model = get_train_loader(config, Cityscapes, portion=config.train_portion)
-    train_loader_arch = get_train_loader(config, Cityscapes, portion=config.train_portion-1)
+    index_select = list(range(config.num_train_imgs))
+    shuffle(index_select)  # shuffle to make sure balanced dataset split
+    train_loader_model = get_train_loader(config, Cityscapes, portion=config.train_portion, index_select=index_select)
+    train_loader_arch = get_train_loader(config, Cityscapes, portion=config.train_portion-1, index_select=index_select)
 
     evaluator = SegEvaluator(Cityscapes(data_setting, 'val', None), config.num_classes, config.image_mean,
                              config.image_std, model, config.eval_scale_array, config.eval_flip, 0, config=config,
