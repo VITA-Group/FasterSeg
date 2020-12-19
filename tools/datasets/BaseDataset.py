@@ -80,7 +80,6 @@ class BaseDataset(data.Dataset):
         with open(source) as f:
             files = f.readlines()
         if self._portion is not None:
-            shuffle(files)
             num_files = len(files)
             if self._portion > 0:
                 split = int(np.floor(self._portion * num_files))
@@ -89,6 +88,7 @@ class BaseDataset(data.Dataset):
                 split = int(np.floor((1 + self._portion) * num_files))
                 files = files[split:]
 
+        shuffle(files)
         for item in files:
             img_name, gt_name = self._process_item_names(item)
             file_names.append([img_name, gt_name])
