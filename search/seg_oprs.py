@@ -12,7 +12,7 @@ import os.path as osp
 latency_lookup_table = {}
 table_file_name = "latency_lookup_table.npy"
 if osp.isfile(table_file_name):
-    latency_lookup_table = np.load(table_file_name).item()
+    latency_lookup_table = np.load(table_file_name, allow_pickle=True).item()
 
 class ConvBnRelu(nn.Module):
     def __init__(self, in_planes, out_planes, ksize, stride, pad, dilation=1,

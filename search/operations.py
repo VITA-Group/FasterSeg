@@ -33,7 +33,7 @@ from slimmable_ops import USConv2d, USBatchNorm2d
 latency_lookup_table = {}
 table_file_name = "latency_lookup_table.npy"
 if osp.isfile(table_file_name):
-    latency_lookup_table = np.load(table_file_name).item()
+    latency_lookup_table = np.load(table_file_name, allow_pickle=True).item()
 
 
 BatchNorm2d = nn.BatchNorm2d

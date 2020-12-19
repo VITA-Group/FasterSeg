@@ -29,7 +29,7 @@ def gumbel_softmax(logits, temperature=1, hard=False):
     return: flatten --> [*, n_class] an one-hot vector
     """
     y = gumbel_softmax_sample(logits, temperature)
-    
+
     if not hard:
         return y
 
@@ -196,7 +196,7 @@ class Network_Multi_Path(nn.Module):
             self._reset_arch_parameters(i)
         # switch set of arch if we have more than 1 arch
         self.arch_idx = 0
-    
+
     def num_filters(self, scale, width=1.0):
         return int(np.round(scale * self._Fch * width))
 
@@ -511,13 +511,13 @@ class Network_Multi_Path(nn.Module):
         alphas = [ "alpha_"+str(idx)+"_"+str(scale) for scale in [0, 1, 2] ]
         betas = [ "beta_"+str(idx)+"_"+str(scale) for scale in [1, 2] ]
 
-        setattr(self, alphas[0], nn.Parameter(Variable(1e-3*torch.ones(self._layers, num_ops).cuda(), requires_grad=True)))
-        setattr(self, alphas[1], nn.Parameter(Variable(1e-3*torch.ones(self._layers-1, num_ops).cuda(), requires_grad=True)))
-        setattr(self, alphas[2], nn.Parameter(Variable(1e-3*torch.ones(self._layers-2, num_ops).cuda(), requires_grad=True)))
+        setattr(self, alphas[0], nn.Parameter(Variable(1e-3*torch.ones(self._layers, num_ops), requires_grad=True)))
+        setattr(self, alphas[1], nn.Parameter(Variable(1e-3*torch.ones(self._layers-1, num_ops), requires_grad=True)))
+        setattr(self, alphas[2], nn.Parameter(Variable(1e-3*torch.ones(self._layers-2, num_ops), requires_grad=True)))
         # betas are now in-degree probs
         # 0: from down; 1: from keep
-        setattr(self, betas[0], nn.Parameter(Variable(1e-3*torch.ones(self._layers-2, 2).cuda(), requires_grad=True)))
-        setattr(self, betas[1], nn.Parameter(Variable(1e-3*torch.ones(self._layers-3, 2).cuda(), requires_grad=True)))
+        setattr(self, betas[0], nn.Parameter(Variable(1e-3*torch.ones(self._layers-2, 2), requires_grad=True)))
+        setattr(self, betas[1], nn.Parameter(Variable(1e-3*torch.ones(self._layers-3, 2), requires_grad=True)))
 
         ratios = [ "ratio_"+str(idx)+"_"+str(scale) for scale in [0, 1, 2] ]
         if self._prun_modes[idx] == 'arch_ratio':
@@ -525,9 +525,9 @@ class Network_Multi_Path(nn.Module):
             num_widths = len(self._width_mult_list)
         else:
             num_widths = 1
-        setattr(self, ratios[0], nn.Parameter(Variable(1e-3*torch.ones(self._layers-1, num_widths).cuda(), requires_grad=True)))
-        setattr(self, ratios[1], nn.Parameter(Variable(1e-3*torch.ones(self._layers-1, num_widths).cuda(), requires_grad=True)))
-        setattr(self, ratios[2], nn.Parameter(Variable(1e-3*torch.ones(self._layers-2, num_widths).cuda(), requires_grad=True)))
+        setattr(self, ratios[0], nn.Parameter(Variable(1e-3*torch.ones(self._layers-1, num_widths), requires_grad=True)))
+        setattr(self, ratios[1], nn.Parameter(Variable(1e-3*torch.ones(self._layers-1, num_widths), requires_grad=True)))
+        setattr(self, ratios[2], nn.Parameter(Variable(1e-3*torch.ones(self._layers-2, num_widths), requires_grad=True)))
         return {"alphas": alphas, "betas": betas, "ratios": ratios}, [getattr(self, name) for name in alphas] + [getattr(self, name) for name in betas] + [getattr(self, name) for name in ratios]
 
     def _reset_arch_parameters(self, idx):
@@ -538,11 +538,11 @@ class Network_Multi_Path(nn.Module):
         else:
             num_widths = 1
 
-        getattr(self, self._arch_names[idx]["alphas"][0]).data = Variable(1e-3*torch.ones(self._layers, num_ops).cuda(), requires_grad=True)
-        getattr(self, self._arch_names[idx]["alphas"][1]).data = Variable(1e-3*torch.ones(self._layers-1, num_ops).cuda(), requires_grad=True)
-        getattr(self, self._arch_names[idx]["alphas"][2]).data = Variable(1e-3*torch.ones(self._layers-2, num_ops).cuda(), requires_grad=True)
-        getattr(self, self._arch_names[idx]["betas"][0]).data = Variable(1e-3*torch.ones(self._layers-2, 2).cuda(), requires_grad=True)
-        getattr(self, self._arch_names[idx]["betas"][1]).data = Variable(1e-3*torch.ones(self._layers-3, 2).cuda(), requires_grad=True)
-        getattr(self, self._arch_names[idx]["ratios"][0]).data = Variable(1e-3*torch.ones(self._layers-1, num_widths).cuda(), requires_grad=True)
-        getattr(self, self._arch_names[idx]["ratios"][1]).data = Variable(1e-3*torch.ones(self._layers-1, num_widths).cuda(), requires_grad=True)
-        getattr(self, self._arch_names[idx]["ratios"][2]).data = Variable(1e-3*torch.ones(self._layers-2, num_widths).cuda(), requires_grad=True)
+        getattr(self, self._arch_names[idx]["alphas"][0]).data = Variable(1e-3*torch.ones(self._layers, num_ops), requires_grad=True)
+        getattr(self, self._arch_names[idx]["alphas"][1]).data = Variable(1e-3*torch.ones(self._layers-1, num_ops), requires_grad=True)
+        getattr(self, self._arch_names[idx]["alphas"][2]).data = Variable(1e-3*torch.ones(self._layers-2, num_ops), requires_grad=True)
+        getattr(self, self._arch_names[idx]["betas"][0]).data = Variable(1e-3*torch.ones(self._layers-2, 2), requires_grad=True)
+        getattr(self, self._arch_names[idx]["betas"][1]).data = Variable(1e-3*torch.ones(self._layers-3, 2), requires_grad=True)
+        getattr(self, self._arch_names[idx]["ratios"][0]).data = Variable(1e-3*torch.ones(self._layers-1, num_widths), requires_grad=True)
+        getattr(self, self._arch_names[idx]["ratios"][1]).data = Variable(1e-3*torch.ones(self._layers-1, num_widths), requires_grad=True)
+        getattr(self, self._arch_names[idx]["ratios"][2]).data = Variable(1e-3*torch.ones(self._layers-2, num_widths), requires_grad=True)
