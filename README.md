@@ -52,7 +52,7 @@ cd FasterSeg
 ```
 * Install dependencies:
 ```bash
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 * Install [PyCuda](https://wiki.tiker.net/PyCuda/Installation) which is a dependency of TensorRT.
 * Install [TensorRT](https://github.com/NVIDIA/TensorRT) (v5.1.5.0): a library for high performance inference on NVIDIA GPUs with [Python API](https://docs.nvidia.com/deeplearning/sdk/tensorrt-api/index.html#python).
