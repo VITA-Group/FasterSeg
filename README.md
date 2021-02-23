@@ -159,7 +159,7 @@ which will generate an `.npy` file. Be careful not to overwrite the provided `la
 ```
 @inproceedings{chen2020fasterseg,
   title={FasterSeg: Searching for Faster Real-time Semantic Segmentation},
-  authors={Chen, Wuyang and Gong, Xinyu and Liu, Xianming and Zhang, Qian and Li, Yuan and Wang, Zhangyang},
+  author={Chen, Wuyang and Gong, Xinyu and Liu, Xianming and Zhang, Qian and Li, Yuan and Wang, Zhangyang},
   booktitle={International Conference on Learning Representations},
   year={2020}
 }
