@@ -242,6 +242,7 @@ def train(pretrain, train_loader_model, train_loader_arch, model, architect, cri
                 logger.add_scalar('loss_arch/train', loss_arch, epoch*len(pbar)+step)
                 logger.add_scalar('arch/latency_supernet', architect.latency_supernet, epoch*len(pbar)+step)
 
+        optimizer.zero_grad()
         loss = model._loss(imgs, target, pretrain)
         logger.add_scalar('loss/train', loss, epoch*len(pbar)+step)
         loss.backward()
