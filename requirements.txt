@@ -1,7 +1,7 @@
 easydict==1.9
 matplotlib==3.0.0
 numpy==1.16.1
-onnx==1.5.0
+onnx==1.13.0
 opencv-python==3.4.4.19
 Pillow==6.2.0
 protobuf==3.8.0
